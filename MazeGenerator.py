@@ -6,6 +6,7 @@ class MazeGenerator:
     def __init__(self,size):
         self.grid=[[Cell(x,y) for x in range(size)] for y in range(size)]
         self.grid[0][0].walls["top"]=False
+        self.grid.generateNeighbours()
         self.size=size
         pass
  #   def gridGenerator(self):
@@ -13,7 +14,18 @@ class MazeGenerator:
  #           for x in range(self.size):
  #               print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
     def generateNeighbours(self):
-        
+        for y in range(self.size):
+            for x in range(self.size):
+                cell=self.grid[y][x]
+                if y-1>=0 :
+                    cell.neighbours.append(self.grid[x][y-1])
+                if y+1<self.size:
+                    cell.neighbours.append(self.grid[x][y+1])
+                if x-1>=0:
+                    cell.neighbours.append(self.grid[x-1][y])
+                if x+1<self.size:
+                    cell.neighbours.append(self.grid[x+1][y])
+
     def removeWall(self, currentCell, pastCell):
         dx=currentCell.x-pastCell.x
         dy=currentCell.y-pastCell.y
