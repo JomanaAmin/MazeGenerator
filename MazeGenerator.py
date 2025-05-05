@@ -4,27 +4,39 @@ from os import remove
 from Cell import Cell
 class MazeGenerator:
     def __init__(self,size):
-        self.grid=[[Cell(x,y) for x in range(size)] for y in range(size)]
-        self.grid[0][0].walls["top"]=False
-        self.grid.generateNeighbours()
         self.size=size
-        pass
- #   def gridGenerator(self):
- #       for y in range(self.size):
- #           for x in range(self.size):
- #               print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
-    def generateNeighbours(self):
+        self.grid=[[Cell(x,y) for y in range(size)] for x in range(size)]
+        self.grid[0][0].walls["top"]=False
+        self.generateNeighbours()
+
+    def showGrid(self):
+        #just prints the grid
         for y in range(self.size):
             for x in range(self.size):
-                cell=self.grid[y][x]
-                if y-1>=0 :
+                print("X:",x,"Y:",y)
+                print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
+
+    def generateNeighbours(self):
+       # print("GENERATING NEIGHBOURS")
+        for y in range(self.size):
+            for x in range(self.size):
+                cell=self.grid[x][y]
+                print(cell.x,cell.y)
+                if y-1>=0 :#top neighbour
                     cell.neighbours.append(self.grid[x][y-1])
-                if y+1<self.size:
+        #            print("top neighbour: ",self.grid[x][y-1].x,self.grid[x][y-1].y)
+                if y+1<self.size: #bottom neighbour
                     cell.neighbours.append(self.grid[x][y+1])
-                if x-1>=0:
+         #           print("bottom neighbour: ",self.grid[x][y+1].x,self.grid[x][y+1].y)
+
+                if x-1>=0: #left neighbour
                     cell.neighbours.append(self.grid[x-1][y])
-                if x+1<self.size:
+          #          print("left neighbour: ",self.grid[x-1][y].x,self.grid[x-1][y].y)
+
+                if x+1<self.size: #right neighbour
                     cell.neighbours.append(self.grid[x+1][y])
+           #         print("right neighbour: ",self.grid[x+1][y].x,self.grid[x+1][y].y)
+
 
     def removeWall(self, currentCell, pastCell):
         dx=currentCell.x-pastCell.x
@@ -60,5 +72,5 @@ class MazeGenerator:
                 for neighbour in unvisited:
                     stack.append(neighbour)
 
-#maze=MazeGenerator(5)
-#maze.gridGenerator();
+maze=MazeGenerator(5)
+maze.generateNeighbours();
