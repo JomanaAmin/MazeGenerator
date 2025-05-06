@@ -32,27 +32,6 @@ def drawCell(cell):
         pygame.draw.line(screen, (255,255,255), ((x+1)*length, y*length), ((x+1)*length, (y+1)*length))
 
 
-def hereDFS(maze):
-    drawGrid()
-    stack=[]
-    pastCell=None
-    cell=maze.grid[0][0]
-    stack.append((cell,pastCell))
-    while len(stack)>0:
-        pair=stack.pop()
-        cell, pastCell = pair
-        if cell.visited==False:
-            cell.visited=True
-            if pastCell!=None:
-                maze.removeWall(cell, pastCell)
-            yield
-            pastCell=cell
-            unvisited=[neighbour for neighbour in cell.neighbours]
-            random.shuffle(unvisited)
-            for neighbour in unvisited:
-                stack.append((neighbour,pastCell))
-    maze.grid[maze.size-1][maze.size-1].walls["bottom"]=False
-
 def generateNewMaze(maze):
 
     maze.resetMaze()
@@ -60,7 +39,7 @@ def generateNewMaze(maze):
 
 
 maze.resetMaze()
-dfs = hereDFS(maze)
+dfs = maze.DFS()
 
 # Game loop
 while running:

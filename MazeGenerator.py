@@ -66,6 +66,7 @@ class MazeGenerator:
                 cell.visited=True
                 if pastCell!=None:
                     self.removeWall(cell, pastCell)
+                yield
                 pastCell=cell
                 unvisited=[neighbour for neighbour in cell.neighbours]
                 random.shuffle(unvisited)
@@ -78,7 +79,8 @@ class MazeGenerator:
                 self.grid[x][y].visited=False
                 for side,status in self.grid[x][y].walls.items():
                     self.grid[x][y].walls[side]=True
-        maze.grid[0][0].walls["top"] = False
+        self.grid[0][0].walls["top"] = False
+
     def isToTheRight(self,currCell,pastCell):
         dx=currCell.x-pastCell.x
         return dx<0
