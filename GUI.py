@@ -9,12 +9,12 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 length=20
-size=10
+size=17
 maze=MazeGenerator(size)
 #maze.DFS()
 #maze.resetMaze()
 def drawGridPath():
-    pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2))
+    pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2), 5)
     for y in range(size):
         for x in range (size):
             drawLink(maze.grid[x][y])
@@ -23,10 +23,10 @@ def drawLink(cell):
     y=cell.y
     centerX=x*length+length/2
     centerY=y*length+length/2
-    if cell.links["left"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX-length,centerY))
-    if cell.links["right"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX+length,centerY))
-    if cell.links["top"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY-length))
-    if cell.links["bottom"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY+length))
+    if cell.links["left"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX-length,centerY),5)
+    if cell.links["right"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX+length,centerY),5)
+    if cell.links["top"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY-length),5)
+    if cell.links["bottom"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY+length),5)
 
 def drawGrid():
     for y in range(size):
@@ -80,6 +80,6 @@ while running:
     if phase in ("bfs", "done"):
         drawGridPath()
     pygame.display.flip()
-    clock.tick(60)  # control the animation speed (FPS)
+    clock.tick(30)  # control the animation speed (FPS)
 
 pygame.quit()
