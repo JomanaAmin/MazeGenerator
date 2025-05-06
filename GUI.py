@@ -15,8 +15,8 @@ def drawGrid():
         for x in range (size):
             drawCell(maze.grid[x][y])
 def drawCell(cell):
-    x=cell.x+20
-    y=cell.y+15
+    x=cell.x
+    y=cell.y
     if cell.walls["top"]:
         pygame.draw.line(screen, (255,255,255), (x*length, y*length), ((x+1)*length, y*length))
     if cell.walls["bottom"]:
