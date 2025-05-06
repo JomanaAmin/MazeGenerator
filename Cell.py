@@ -10,3 +10,9 @@ class Cell:
             "left": True,
             "right": True
         }
+        self.links={
+            "top":False,
+            "bottom":False,
+            "left":False,
+            "right":False
+        }

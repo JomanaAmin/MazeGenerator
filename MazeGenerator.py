@@ -40,24 +40,21 @@ class MazeGenerator:
 
 
     def removeWall(self, currentCell, pastCell):
-        dx=currentCell.x-pastCell.x
-        dy=currentCell.y-pastCell.y
-        if dx!=0:
-            if dx<0:
-                currentCell.walls["right"]=False
-                pastCell.walls["left"]=False
-            else:
-                currentCell.walls["left"]=False
-                pastCell.walls["right"]=False
-        else:
-            if dy<0:
-                currentCell.walls["bottom"]=False
-                pastCell.walls["top"]=False
-            else:
-                currentCell.walls["top"]=False
-                pastCell.walls["bottom"]=False
+
+        if self.isToTheRight(currentCell, pastCell): #if the past cell is to the right of current cell
+            currentCell.walls["right"]=False
+            pastCell.walls["left"]=False
+        elif self.isToTheLeft(currentCell,pastCell): #if the past cell is to the left of current cell
+            currentCell.walls["left"]=False
+            pastCell.walls["right"]=False
+        elif self.isToTheBottom(currentCell, pastCell):#if the past cell is at the bottom of current cell
+            currentCell.walls["bottom"]=False
+            pastCell.walls["top"]=False
+        elif self.isToTheTop(currentCell, pastCell):#if the past cell is to the top of current cell
+            currentCell.walls["top"]=False
+            pastCell.walls["bottom"]=False
+
     def DFS(self):
-        print("INSIDE DFS")
         stack=[]
         pastCell=None
         cell=self.grid[0][0]
@@ -67,7 +64,6 @@ class MazeGenerator:
             cell, pastCell = pair
             if cell.visited==False:
                 cell.visited=True
-                print(cell.x,cell.y)
                 if pastCell!=None:
                     self.removeWall(cell, pastCell)
                 pastCell=cell
@@ -76,5 +72,26 @@ class MazeGenerator:
                 for neighbour in unvisited:
                     stack.append((neighbour,pastCell))
         self.grid[self.size-1][self.size-1].walls["bottom"]=False
+    def resetMaze(self):
+        for y in range(self.size):
+            for x in range(self.size):
+                self.grid[x][y].visited=False
+                for side,status in self.grid[x][y].walls.items():
+                    self.grid[x][y].walls[side]=True
+        maze.grid[0][0].walls["top"] = False
+    def isToTheRight(self,currCell,pastCell):
+        dx=currCell.x-pastCell.x
+        return dx<0
+
+    def isToTheLeft(self,currCell,pastCell):
+        dx = currCell.x - pastCell.x
+        return dx > 0
+
+    def isToTheBottom(self,currCell,pastCell):
+        dy = currCell.y - pastCell.y
+        return dy < 0
+    def isToTheTop(self,currCell,pastCell):
+        dy = currCell.y - pastCell.y
+        return dy > 0
 maze=MazeGenerator(4)
 maze.DFS()

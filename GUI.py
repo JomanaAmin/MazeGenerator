@@ -1,3 +1,5 @@
+import random
+
 import pygame
 from pygame import Rect
 
@@ -7,9 +9,10 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 length=20
-size=10
+size=35
 maze=MazeGenerator(size)
-maze.DFS()
+#maze.DFS()
+#maze.resetMaze()
 def drawGrid():
     for y in range(size):
         for x in range (size):
@@ -29,18 +32,51 @@ def drawCell(cell):
         pygame.draw.line(screen, (255,255,255), ((x+1)*length, y*length), ((x+1)*length, (y+1)*length))
 
 
+def hereDFS(maze):
+    drawGrid()
+    stack=[]
+    pastCell=None
+    cell=maze.grid[0][0]
+    stack.append((cell,pastCell))
+    while len(stack)>0:
+        pair=stack.pop()
+        cell, pastCell = pair
+        if cell.visited==False:
+            cell.visited=True
+            if pastCell!=None:
+                maze.removeWall(cell, pastCell)
+            yield
+            pastCell=cell
+            unvisited=[neighbour for neighbour in cell.neighbours]
+            random.shuffle(unvisited)
+            for neighbour in unvisited:
+                stack.append((neighbour,pastCell))
+    maze.grid[maze.size-1][maze.size-1].walls["bottom"]=False
 
+def generateNewMaze(maze):
+
+    maze.resetMaze()
+    maze.DFS()
+
+
+maze.resetMaze()
+dfs = hereDFS(maze)
+
+# Game loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("purple")
+    screen.fill("dark grey")
 
-    # RENDER YOUR GAME HERE
+    try:
+        next(dfs)  # advance one DFS step per frame
+    except StopIteration:
+        pass  # DFS finished
+
     drawGrid()
     pygame.display.flip()
-
-    clock.tick(60)
+    clock.tick(60)  # control the animation speed (FPS)
 
 pygame.quit()
