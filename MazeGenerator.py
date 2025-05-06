@@ -81,19 +81,25 @@ class MazeGenerator:
                     self.grid[x][y].walls[side]=True
         self.grid[0][0].walls["top"] = False
 
-    def isToTheRight(self,currCell,pastCell):
-        dx=currCell.x-pastCell.x
+    def isToTheRight(self,currCell,adjacentCell):
+        dx=currCell.x-adjacentCell.x
         return dx<0
 
-    def isToTheLeft(self,currCell,pastCell):
-        dx = currCell.x - pastCell.x
+    def isToTheLeft(self,currCell,adjacentCell):
+        dx = currCell.x - adjacentCell.x
         return dx > 0
 
-    def isToTheBottom(self,currCell,pastCell):
-        dy = currCell.y - pastCell.y
+    def isToTheBottom(self,currCell,adjacentCell):
+        dy = currCell.y - adjacentCell.y
         return dy < 0
-    def isToTheTop(self,currCell,pastCell):
-        dy = currCell.y - pastCell.y
+    def isToTheTop(self,currCell,adjacentCell):
+        dy = currCell.y - adjacentCell.y
         return dy > 0
+    def thereIsPath(self,currCell,adjacentCell):
+        if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]: return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
+        elif self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]: return True
+        elif self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]: return True
+        elif self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]: return True
+
 maze=MazeGenerator(4)
 maze.DFS()
