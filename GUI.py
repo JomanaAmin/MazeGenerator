@@ -47,7 +47,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill("dark grey")
+    screen.fill("grey")
 
     try:
         next(dfs)  # advance one DFS step per frame
