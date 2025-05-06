@@ -6,11 +6,28 @@ pygame.init()
 screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
-length=10
-maze=MazeGenerator(8)
-def drawCells():
-    for cell in maze.grid:
-        
+length=20
+size=10
+maze=MazeGenerator(size)
+maze.DFS()
+def drawGrid():
+    for y in range(size):
+        for x in range (size):
+            drawCell(maze.grid[x][y])
+def drawCell(cell):
+    x=cell.x+20
+    y=cell.y+15
+    if cell.walls["top"]:
+        pygame.draw.line(screen, (255,255,255), (x*length, y*length), ((x+1)*length, y*length))
+    if cell.walls["bottom"]:
+        pygame.draw.line(screen, (255,255,255), (x*length, (y+1) *length), ((x+1)*length, (y+1)*length))
+
+    if cell.walls["left"]:
+        pygame.draw.line(screen, (255,255,255), (x*length, y*length), (x*length, (y+1)*length))
+
+    if cell.walls["right"]:
+        pygame.draw.line(screen, (255,255,255), ((x+1)*length, y*length), ((x+1)*length, (y+1)*length))
+
 
 
 while running:
@@ -21,14 +38,7 @@ while running:
     screen.fill("purple")
 
     # RENDER YOUR GAME HERE
-  """  for y in range(8):
-        yCoord=y*10
-        for x in range(8):
-            xCoord=x*10
-            pygame.draw.rect(screen, "white", Rect(x,y,length,length))
-    for cell in maze.grid:
-        pygame.draw.rect(screen, "white", Rect(cell.x*10, y*10, length, length))
-"""
+    drawGrid()
     pygame.display.flip()
 
     clock.tick(60)

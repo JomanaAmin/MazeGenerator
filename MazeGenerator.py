@@ -71,6 +71,6 @@ class MazeGenerator:
                 random.shuffle(unvisited)
                 for neighbour in unvisited:
                     stack.append(neighbour)
-
+        self.grid[self.size-1][self.size-1].walls["bottom"]=False
 maze=MazeGenerator(5)
 maze.generateNeighbours();
