@@ -1,5 +1,5 @@
 import random
-from os import remove
+
 
 from Cell import Cell
 class MazeGenerator:
@@ -17,8 +17,9 @@ class MazeGenerator:
                 print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
 
     def generateNeighbours(self):
-       # print("GENERATING NEIGHBOURS")
+      #  print("GENERATING NEIGHBOURS")
         for y in range(self.size):
+       #     print("NEIGHBOURS:",y)
             for x in range(self.size):
                 cell=self.grid[x][y]
                 print(cell.x,cell.y)
@@ -56,21 +57,24 @@ class MazeGenerator:
                 currentCell.walls["top"]=False
                 pastCell.walls["bottom"]=False
     def DFS(self):
+        print("INSIDE DFS")
         stack=[]
         pastCell=None
         cell=self.grid[0][0]
-        stack.append(cell)
+        stack.append((cell,pastCell))
         while len(stack)>0:
-            cell=stack.pop()
-            if not cell.visited:
+            pair=stack.pop()
+            cell, pastCell = pair
+            if cell.visited==False:
                 cell.visited=True
+                print(cell.x,cell.y)
                 if pastCell!=None:
                     self.removeWall(cell, pastCell)
                 pastCell=cell
                 unvisited=[neighbour for neighbour in cell.neighbours]
                 random.shuffle(unvisited)
                 for neighbour in unvisited:
-                    stack.append(neighbour)
+                    stack.append((neighbour,pastCell))
         self.grid[self.size-1][self.size-1].walls["bottom"]=False
-maze=MazeGenerator(5)
-maze.generateNeighbours();
+maze=MazeGenerator(4)
+maze.DFS()
