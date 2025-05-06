@@ -9,10 +9,25 @@ screen = pygame.display.set_mode((1280, 720))
 clock = pygame.time.Clock()
 running = True
 length=20
-size=35
+size=10
 maze=MazeGenerator(size)
 #maze.DFS()
 #maze.resetMaze()
+def drawGridPath():
+    pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2))
+    for y in range(size):
+        for x in range (size):
+            drawLink(maze.grid[x][y])
+def drawLink(cell):
+    x=cell.x
+    y=cell.y
+    centerX=x*length+length/2
+    centerY=y*length+length/2
+    if cell.links["left"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX-length,centerY))
+    if cell.links["right"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX+length,centerY))
+    if cell.links["top"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY-length))
+    if cell.links["bottom"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY+length))
+
 def drawGrid():
     for y in range(size):
         for x in range (size):
@@ -40,21 +55,30 @@ def generateNewMaze(maze):
 
 maze.resetMaze()
 dfs = maze.DFS()
+bfs = None
+phase = "dfs"
 
-# Game loop
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
     screen.fill("grey")
-
-    try:
-        next(dfs)  # advance one DFS step per frame
-    except StopIteration:
-        pass  # DFS finished
+    if phase == "dfs":
+        try:
+            next(dfs)
+        except StopIteration:
+            bfs = maze.BFS()
+            phase = "bfs"
+    elif phase == "bfs":
+        try:
+            next(bfs)
+        except StopIteration:
+            phase = "done"
 
     drawGrid()
+    if phase in ("bfs", "done"):
+        drawGridPath()
     pygame.display.flip()
     clock.tick(60)  # control the animation speed (FPS)
 

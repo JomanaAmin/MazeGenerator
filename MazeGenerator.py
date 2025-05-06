@@ -55,6 +55,8 @@ class MazeGenerator:
             pastCell.walls["bottom"]=False
 
     def DFS(self):
+        self.grid[self.size-1][self.size-1].walls["bottom"]=False
+
         stack=[]
         pastCell=None
         cell=self.grid[0][0]
@@ -72,14 +74,20 @@ class MazeGenerator:
                 random.shuffle(unvisited)
                 for neighbour in unvisited:
                     stack.append((neighbour,pastCell))
-        self.grid[self.size-1][self.size-1].walls["bottom"]=False
+        self.markAllAsUnvisited()
     def resetMaze(self):
         for y in range(self.size):
             for x in range(self.size):
                 self.grid[x][y].visited=False
                 for side,status in self.grid[x][y].walls.items():
                     self.grid[x][y].walls[side]=True
+
         self.grid[0][0].walls["top"] = False
+    def markAllAsUnvisited(self):
+        for y in range(self.size):
+            for x in range(self.size):
+                self.grid[x][y].visited=False
+
 
     def isToTheRight(self,currCell,adjacentCell):
         dx=currCell.x-adjacentCell.x
@@ -97,9 +105,51 @@ class MazeGenerator:
         return dy > 0
     def thereIsPath(self,currCell,adjacentCell):
         if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]: return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
-        elif self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]: return True
-        elif self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]: return True
-        elif self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]: return True
+        if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]: return True
+        if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]: return True
+        if self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]: return True
+        return False #There is no path because a wall exists between the cell and its adjacent cell
+    def createLink(self,cell,adjacentCell):
+        if self.isToTheTop(cell,adjacentCell):
+            cell.links["top"]=True
+            adjacentCell.links["bottom"]=True
+
+        if self.isToTheBottom(cell, adjacentCell):
+            cell.links["bottom"] = True
+            adjacentCell.links["top"] = True
+
+        if self.isToTheRight(cell,adjacentCell):
+            cell.links["right"] = True
+            adjacentCell.links["left"] = True
+
+        if self.isToTheLeft(cell,adjacentCell):
+            cell.links["left"] = True
+            adjacentCell.links["right"] = True
+
+
+    def BFS (self):
+        cell=self.grid[0][0]
+        queue=[]
+        #queue.append((cell,None))
+        queue.append(cell)
+        cell.visited=True
+        while len(queue)>0:
+           # pair=queue.pop(0)
+           # cell, pastCell = pair
+            cell=queue.pop(0)
+
+            for neighbour in cell.neighbours:
+                if neighbour.visited==False and self.thereIsPath(cell,neighbour):
+                    if neighbour.x==self.size-1 and neighbour.y==self.size-1:
+                        self.createLink(cell, neighbour)
+
+                        #cell.links["bottom"]=True
+                        return
+                    neighbour.visited=True
+                    self.createLink(cell,neighbour)
+                    yield
+                    #queue.append((neighbour,cell))
+                    queue.append(neighbour)
 
 maze=MazeGenerator(4)
 maze.DFS()
