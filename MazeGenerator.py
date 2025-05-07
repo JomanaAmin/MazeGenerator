@@ -163,6 +163,8 @@ class MazeGenerator:
 
 
     def BFS (self):
+        self.resetLinks()
+        self.markAllAsUnvisited()
         cell=self.grid[0][0]
         queue=[]
         #queue.append((cell,None))
@@ -177,17 +179,16 @@ class MazeGenerator:
                 if neighbour.visited==False and self.thereIsPath(cell,neighbour):
                     if neighbour.x==self.size-1 and neighbour.y==self.size-1:
                         self.createLink(cell, neighbour)
-
-                        #cell.links["bottom"]=True
+                        neighbour.links["bottom"]=True
                         return
+#
                     neighbour.visited=True
                     self.createLink(cell,neighbour)
                     yield
                     #queue.append((neighbour,cell))
                     queue.append(neighbour)
-        self.resetLinks()
     def resetLinks(self):
-        for y in self.grid:
-            for x in self.grid:
-                for link,status in self.grid[x][y].links.items():
-                    self.grid[x][y].links[link]=False
+        for x in range(self.size):
+            for y in range(self.size):
+                for link in self.grid[x][y].links:
+                    self.grid[x][y].links[link] = False

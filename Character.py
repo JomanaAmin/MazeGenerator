@@ -92,7 +92,9 @@ class Character:
             screen.blit(self.walkRight[self.walkCount//3],(self.x,self.y))
         else:
             screen.blit(self.idle,(self.x,self.y))
-
+    def reset(self):
+        self.x = 0
+        self.y = 0
     def characterMovement(self,keys,maze):
 
         if keys[pygame.K_LEFT] and self.x > 0 and self.canPass(maze, keys):
