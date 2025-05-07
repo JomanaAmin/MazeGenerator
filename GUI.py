@@ -38,7 +38,7 @@ solveBFS=Button(screen,maze.width+5,45,"Solve Maze: BFS")
 reset=Button(screen,maze.width+5,80,"Reset Maze")
 solveAstar=Button(screen,maze.width+5,115,"Solve Maze: A star")
 #MESSAGES
-win_text = font.render("You Won!", True, (0, 255, 0))
+win_msg = font.render("You Won!", True, "Black")
 
 
 def drawGridPath():
@@ -159,8 +159,7 @@ while running:
 
     if won:
         # if the user won, draw win msg
-        win_rect = win_text.get_rect(center=(screenWidth / 2, screenHeight / 2))
-        screen.blit(win_text,(screenWidth/2,maze.width+10) )
+        screen.blit(win_msg,(screenWidth/2-50,maze.width+20) )
     #updates screen each frame
     pygame.display.update()
     clock.tick(27)
