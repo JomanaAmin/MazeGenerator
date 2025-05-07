@@ -37,12 +37,6 @@ class Character:
             pygame.image.load(r"Y:\AlgoProject\ezgif-split\down\down3.png")
         ]
         self.idle=pygame.image.load(r"Y:\AlgoProject\ezgif-split\idle\idle1.png")
-
-       # self.topLeftCorner=(self.x,self.y)
-       # self.topRightCorner=(self.x,self.y+length)
-       # self.bottomLeftCorner=(self.x+length,self.y)
-       # self.bottomRightCorner=(self.x+length,self.y+length)
-       # self.currentCell=(x,y)
         self.walkCount=0
 
     def mazeSolved(self,maze):
@@ -128,3 +122,10 @@ class Character:
             self.direction["down"] = False
             self.walkCount = 0
 
+    def resetDirections(self):
+        self.direction={
+            "up":False,
+            "down":False,
+            "left":False,
+            "right":False
+        }

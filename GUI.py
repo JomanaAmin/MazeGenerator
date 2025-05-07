@@ -75,6 +75,8 @@ dfs_done = False
 bfs_done = False
 won=False
 while running:
+    screen.fill("grey")  # Clear screen
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #if user clicks on the X
             running = False
@@ -98,22 +100,19 @@ while running:
 
     keys = pygame.key.get_pressed() #returns a list of keys with t or f for each key indicating if it is pressed rn
 
-    if not won and dfs_done: #character can move ONLY when dfs is done and when they did not win yet
-        character.characterMovement(keys, maze) #this method processes movement of character
-        won=character.mazeSolved(maze) #as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
 
     if phase == "dfs": #this is true when you click the generateMazeDFS button
         try:
             next(dfs) #runs the next iteration of DFS generator method till a wall is removed then returns (when it returns it runs through the rest of the code and renders this on the screen then goes through the condition again, removed next wall, and so on till the stack is empty and method/generator  stops)
         except StopIteration: #if the stack is empty, the DFS generation method ended
             dfs_done = True #dfs_done is true now, now the player can move
-            phase = ""  # set phase to idle which just waits for controls
+            phase = "idle"  # set phase to idle which just waits for controls
 
     elif phase == "bfs" : #same as dfs generator
         try:
             next(bfs)
         except StopIteration:
-            phase = "bfs_done"
+            phase = "idle"
     elif phase=="reset":
         maze.resetMaze()
         dfs = maze.DFS()
@@ -121,27 +120,30 @@ while running:
         dfs_done = False
         character.reset()
         won = False
-        phase = ""
+        phase = "idle"
+    elif phase=="idle":
+        if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
+            character.characterMovement(keys, maze)  # this method processes movement of character
+            won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
+        elif won:
+            # if the user won, draw win msg
+            character.resetDirections()
+            screen.blit(win_msg, (screenWidth / 2 - 50, maze.width + 20))
 
-    screen.fill("grey")  # Clear screen
     #drawing buttons
     generateMazeDFS.drawButton(screen)
     solveBFS.drawButton(screen)
     reset.drawButton(screen)
     solveAstar.drawButton(screen)
     solveDFS.drawButton(screen)
-    #draw grid
-    drawGrid()
-    if won:
-        # if the user won, draw win msg
-        screen.blit(win_msg,(screenWidth/2-50,maze.width+20) )
-   # if phase in ("bfs", "bfs_done"):
-    drawGridPath()
-    #draw character
-    character.animate(screen)
+    drawGrid()#draw grid
 
 
-    #updates screen each frame
-    pygame.display.update()
-    clock.tick(20)
+   # if phase in ("bfs", "bfs_done"):   useless line
+    drawGridPath()#draws maze solution
+    character.animate(screen)#draw character
+
+    pygame.display.update()#updates screen each frame
+
+    clock.tick(27)
 pygame.quit()

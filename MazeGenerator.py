@@ -99,14 +99,14 @@ class MazeGenerator:
         dx =  adjacentCell.x-currCell.x
         result = dx == 1
 
-        print("next cell to the right:", result)
+        #print("next cell to the right:", result)
         return dx==1
 
     def isToTheLeft(self,currCell,adjacentCell):
         dx =  adjacentCell.x-currCell.x
         result = dx == -1
 
-        print("next cell to the left:",result)
+        #print("next cell to the left:",result)
 
         return dx==-1
 
@@ -114,33 +114,33 @@ class MazeGenerator:
         dy =  adjacentCell.y-currCell.y
         result = dy == 1
 
-        print("next cell to the bottom:",result)
+        #print("next cell to the bottom:",result)
 
         return dy ==1
     def isToTheTop(self,currCell,adjacentCell):
         dy =  adjacentCell.y-currCell.y
         result = dy == -1
 
-        print("next cell to the top:",result)
+        #print("next cell to the top:",result)
 
         return dy==-1
     def thereIsPath(self,currCell,adjacentCell):
         if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]:
-            print (" there is a path to the right ")
+         #   print (" there is a path to the right ")
 
             return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
         if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]:
-            print (" there is a path to the left ")
+         #   print (" there is a path to the left ")
 
             return True
 
         if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]:
-            print (" there is a path to the bottom ")
+          #  print (" there is a path to the bottom ")
 
             return True
 
         if self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]:
-            print (" there is a path to the top ")
+           # print (" there is a path to the top ")
             return True
 
         return False #There is no path because a wall exists between the cell and its adjacent cell
