@@ -2,12 +2,17 @@ import random
 
 
 from Cell import Cell
+
+
 class MazeGenerator:
-    def __init__(self,size):
+    def __init__(self,size,length):
         self.size=size
         self.grid=[[Cell(x,y) for y in range(size)] for x in range(size)]
         self.grid[0][0].walls["top"]=False
         self.generateNeighbours()
+        self.size=size
+        self.length=length
+        self.width=self.size*self.length
 
     def showGrid(self):
         #just prints the grid
@@ -81,6 +86,7 @@ class MazeGenerator:
                 self.grid[x][y].visited=False
                 for side,status in self.grid[x][y].walls.items():
                     self.grid[x][y].walls[side]=True
+                    self.grid[x][y].links[side]=False
 
         self.grid[0][0].walls["top"] = False
     def markAllAsUnvisited(self):
@@ -90,24 +96,53 @@ class MazeGenerator:
 
 
     def isToTheRight(self,currCell,adjacentCell):
-        dx=currCell.x-adjacentCell.x
-        return dx<0
+        dx =  adjacentCell.x-currCell.x
+        result = dx == 1
+
+        print("next cell to the right:", result)
+        return dx==1
 
     def isToTheLeft(self,currCell,adjacentCell):
-        dx = currCell.x - adjacentCell.x
-        return dx > 0
+        dx =  adjacentCell.x-currCell.x
+        result = dx == -1
+
+        print("next cell to the left:",result)
+
+        return dx==-1
 
     def isToTheBottom(self,currCell,adjacentCell):
-        dy = currCell.y - adjacentCell.y
-        return dy < 0
+        dy =  adjacentCell.y-currCell.y
+        result = dy == 1
+
+        print("next cell to the bottom:",result)
+
+        return dy ==1
     def isToTheTop(self,currCell,adjacentCell):
-        dy = currCell.y - adjacentCell.y
-        return dy > 0
+        dy =  adjacentCell.y-currCell.y
+        result = dy == -1
+
+        print("next cell to the top:",result)
+
+        return dy==-1
     def thereIsPath(self,currCell,adjacentCell):
-        if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]: return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
-        if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]: return True
-        if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]: return True
-        if self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]: return True
+        if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]:
+            print (" there is a path to the right ")
+
+            return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
+        if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]:
+            print (" there is a path to the left ")
+
+            return True
+
+        if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]:
+            print (" there is a path to the bottom ")
+
+            return True
+
+        if self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]:
+            print (" there is a path to the top ")
+            return True
+
         return False #There is no path because a wall exists between the cell and its adjacent cell
     def createLink(self,cell,adjacentCell):
         if self.isToTheTop(cell,adjacentCell):
@@ -150,6 +185,9 @@ class MazeGenerator:
                     yield
                     #queue.append((neighbour,cell))
                     queue.append(neighbour)
-
-maze=MazeGenerator(4)
-maze.DFS()
+        self.resetLinks()
+    def resetLinks(self):
+        for y in self.grid:
+            for x in self.grid:
+                for link,status in self.grid[x][y].links.items():
+                    self.grid[x][y].links[link]=False
