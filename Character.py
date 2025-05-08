@@ -13,30 +13,29 @@ class Character:
             "right":False
         }
         self.walkRight = [
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\right\right1.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\right\right2.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\right\right3.png")
+            pygame.image.load(r"sprite/right/right1.png"),
+            pygame.image.load(r"sprite/right/right2.png"),
+            pygame.image.load(r"sprite/right/right3.png")
         ]
 
         self.walkLeft = [
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\left\left1.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\left\left2.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\left\left3.png")
+            pygame.image.load(r"sprite/left/left1.png"),
+            pygame.image.load(r"sprite/left/left2.png"),
+            pygame.image.load(r"sprite/left/left3.png")
         ]
 
         self.walkUp = [
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\up\up1.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\up\up2.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\up\up3.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\up\up4.png")
+            pygame.image.load(r"sprite/up/up1.png"),
+            pygame.image.load(r"sprite/up/up2.png"),
+            pygame.image.load(r"sprite/up/up3.png"),
         ]
 
         self.walkDown = [
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\down\down1.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\down\down2.png"),
-            pygame.image.load(r"Y:\AlgoProject\ezgif-split\down\down3.png")
+            pygame.image.load(r"sprite/down/down1.png"),
+            pygame.image.load(r"sprite/down/down2.png"),
+            pygame.image.load(r"sprite/down/down3.png")
         ]
-        self.idle=pygame.image.load(r"Y:\AlgoProject\ezgif-split\idle\idle1.png")
+        self.idle=pygame.image.load(r"sprite/idle/idle1.png")
         self.walkCount=0
 
     def mazeSolved(self,maze):
@@ -77,13 +76,13 @@ class Character:
         if self.walkCount>=26:
             self.walkCount=0
         if self.direction["up"]:
-            screen.blit(self.walkUp[self.walkCount//3],(self.x,self.y))
-        if self.direction["down"]:
-            screen.blit(self.walkDown[self.walkCount//3],(self.x,self.y))
-        if self.direction["left"]:
-            screen.blit(self.walkLeft[self.walkCount//3],(self.x,self.y))
-        if self.direction["right"]:
-            screen.blit(self.walkRight[self.walkCount//3],(self.x,self.y))
+            screen.blit(self.walkUp[self.walkCount%3],(self.x,self.y))
+        elif self.direction["down"]:
+            screen.blit(self.walkDown[self.walkCount%3],(self.x,self.y))
+        elif self.direction["left"]:
+            screen.blit(self.walkLeft[self.walkCount%3],(self.x,self.y))
+        elif self.direction["right"]:
+            screen.blit(self.walkRight[self.walkCount%3],(self.x,self.y))
         else:
             screen.blit(self.idle,(self.x,self.y))
     def reset(self):
@@ -97,24 +96,31 @@ class Character:
             self.direction["up"] = False
             self.direction["down"] = False
             self.x -= self.vel
+            self.walkCount+=1
         elif keys[pygame.K_RIGHT] and self.x < maze.width - maze.length  and self.canPass(maze, keys):
             self.direction["right"] = True
             self.direction["left"] = False
             self.direction["up"] = False
             self.direction["down"] = False
             self.x += self.vel
+            self.walkCount+=1
+
         elif keys[pygame.K_UP] and self.y > 0 and self.canPass(maze, keys):
             self.direction["up"] = True
             self.direction["left"] = False
             self.direction["right"] = False
             self.direction["down"] = False
             self.y -= self.vel
+            self.walkCount+=1
+
         elif keys[pygame.K_DOWN] and self.y < maze.width - maze.length  and self.canPass(maze, keys):
             self.direction["down"] = True
             self.direction["left"] = False
             self.direction["right"] = False
             self.direction["up"] = False
             self.y += self.vel
+            self.walkCount+=1
+
         else:
             self.direction["left"] = False
             self.direction["right"] = False
