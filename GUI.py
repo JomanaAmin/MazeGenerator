@@ -11,19 +11,20 @@ clock = pygame.time.Clock()
 running = True
 length=25
 size=10
+trials=0
 maze=MazeGenerator(size,length)
 character=Character(maze,0,0)
 #DIMENSIONS
 screenWidth = maze.width + 200
 screenHeight = maze.width + 70
 screen = pygame.display.set_mode((screenWidth, screenHeight))
-font=pygame.font.Font('freesansbold.ttf',20)
+font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insensitive
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+5,10,"Generate Maze: DFS")
 solveBFS=Button(screen,maze.width+5,45,"Solve Maze: BFS")
-reset=Button(screen,maze.width+5,80,"Reset Maze")
+reset=Button(screen,maze.width+5,150,"Reset Maze")
 solveAstar=Button(screen,maze.width+5,115,"Solve Maze: A star")
-solveDFS=Button(screen,maze.width+5,150,"Solve Maze: DFS")
+solveDFS=Button(screen,maze.width+5,80,"Solve Maze: DFS")
 #MESSAGES
 win_msg = font.render("You Won!", True, "Black")
 
@@ -121,14 +122,14 @@ while running:
         character.reset()
         won = False
         phase = "idle"
-    elif phase=="idle":
-        if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
-            character.characterMovement(keys, maze)  # this method processes movement of character
-            won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
-        elif won:
-            # if the user won, draw win msg
-            character.resetDirections()
-            screen.blit(win_msg, (screenWidth / 2 - 50, maze.width + 20))
+
+    if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
+        character.characterMovement(keys, maze)  # this method processes movement of character
+        won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
+    elif won:
+        # if the user won, draw win msg
+        character.resetDirections()
+        screen.blit(win_msg, (screenWidth / 2 - 50, maze.width + 20))
 
     #drawing buttons
     generateMazeDFS.drawButton(screen)
