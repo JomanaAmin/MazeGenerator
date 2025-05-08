@@ -1,194 +1,167 @@
-import random
+import math
+import heapq
 
+# Define the Cell class
+class Cell:
+    def __init__(self):
+        self.parent_i = 0  # Parent cell's row index
+        self.parent_j = 0  # Parent cell's column index
+        self.f = float('inf')  # Total cost of the cell (g + h)
+        self.g = float('inf')  # Cost from start to this cell
+        self.h = 0  # Heuristic cost from this cell to destination
 
-from Cell import Cell
+# Define the size of the grid
+ROW = 9
+COL = 10
 
+# Check if a cell is valid (within the grid)
+def is_valid(row, col):
+    return (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
 
-class MazeGenerator:
-    def __init__(self,size,length):
-        self.size=size
-        self.grid=[[Cell(x,y) for y in range(size)] for x in range(size)]
-        self.grid[0][0].walls["top"]=False
-        self.generateNeighbours()
-        self.size=size
-        self.length=length
-        self.width=self.size*self.length
+# Check if a cell is unblocked
+def is_unblocked(grid, row, col):
+    return grid[row][col] == 1
 
-    def showGrid(self):
-        #just prints the grid
-        for y in range(self.size):
-            for x in range(self.size):
-                print("X:",x,"Y:",y)
-                print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
+# Check if a cell is the destination
+def is_destination(row, col, dest):
+    return row == dest[0] and col == dest[1]
 
-    def generateNeighbours(self):
-      #  print("GENERATING NEIGHBOURS")
-        for y in range(self.size):
-       #     print("NEIGHBOURS:",y)
-            for x in range(self.size):
-                cell=self.grid[x][y]
-                print(cell.x,cell.y)
-                if y-1>=0 :#top neighbour
-                    cell.neighbours.append(self.grid[x][y-1])
-        #            print("top neighbour: ",self.grid[x][y-1].x,self.grid[x][y-1].y)
-                if y+1<self.size: #bottom neighbour
-                    cell.neighbours.append(self.grid[x][y+1])
-         #           print("bottom neighbour: ",self.grid[x][y+1].x,self.grid[x][y+1].y)
+# Calculate the heuristic value of a cell (Euclidean distance to destination)
+def calculate_h_value(row, col, dest):
+    return ((row - dest[0]) ** 2 + (col - dest[1]) ** 2) ** 0.5
 
-                if x-1>=0: #left neighbour
-                    cell.neighbours.append(self.grid[x-1][y])
-          #          print("left neighbour: ",self.grid[x-1][y].x,self.grid[x-1][y].y)
+# Trace the path from source to destination
+def trace_path(cell_details, dest):
+    print("The Path is ")
+    path = []
+    row = dest[0]
+    col = dest[1]
 
-                if x+1<self.size: #right neighbour
-                    cell.neighbours.append(self.grid[x+1][y])
-           #         print("right neighbour: ",self.grid[x+1][y].x,self.grid[x+1][y].y)
+    # Trace the path from destination to source using parent cells
+    while not (cell_details[row][col].parent_i == row and cell_details[row][col].parent_j == col):
+        path.append((row, col))
+        temp_row = cell_details[row][col].parent_i
+        temp_col = cell_details[row][col].parent_j
+        row = temp_row
+        col = temp_col
 
+    # Add the source cell to the path
+    path.append((row, col))
+    # Reverse the path to get the path from source to destination
+    path.reverse()
 
-    def removeWall(self, currentCell, pastCell):
+    # Print the path
+    for i in path:
+        print("->", i, end=" ")
+    print()
 
-        if self.isToTheRight(currentCell, pastCell): #if the past cell is to the right of current cell
-            currentCell.walls["right"]=False
-            pastCell.walls["left"]=False
-        elif self.isToTheLeft(currentCell,pastCell): #if the past cell is to the left of current cell
-            currentCell.walls["left"]=False
-            pastCell.walls["right"]=False
-        elif self.isToTheBottom(currentCell, pastCell):#if the past cell is at the bottom of current cell
-            currentCell.walls["bottom"]=False
-            pastCell.walls["top"]=False
-        elif self.isToTheTop(currentCell, pastCell):#if the past cell is to the top of current cell
-            currentCell.walls["top"]=False
-            pastCell.walls["bottom"]=False
+# Implement the A* search algorithm
+def a_star_search(grid, src, dest):
+    # Check if the source and destination are valid
+    if not is_valid(src[0], src[1]) or not is_valid(dest[0], dest[1]):
+        print("Source or destination is invalid")
+        return
 
-    def DFS(self):
-        self.grid[self.size-1][self.size-1].walls["bottom"]=False
+    # Check if the source and destination are unblocked
+    if not is_unblocked(grid, src[0], src[1]) or not is_unblocked(grid, dest[0], dest[1]):
+        print("Source or the destination is blocked")
+        return
 
-        stack=[]
-        pastCell=None
-        cell=self.grid[0][0]
-        stack.append((cell,pastCell))
-        while len(stack)>0:
-            pair=stack.pop()
-            cell, pastCell = pair
-            if cell.visited==False:
-                cell.visited=True
-                if pastCell!=None:
-                    self.removeWall(cell, pastCell)
-                yield
-                pastCell=cell
-                unvisited=[neighbour for neighbour in cell.neighbours]
-                random.shuffle(unvisited)
-                for neighbour in unvisited:
-                    stack.append((neighbour,pastCell))
-        self.markAllAsUnvisited()
-    def resetMaze(self):
-        for y in range(self.size):
-            for x in range(self.size):
-                self.grid[x][y].visited=False
-                for side,status in self.grid[x][y].walls.items():
-                    self.grid[x][y].walls[side]=True
-                    self.grid[x][y].links[side]=False
+    # Check if we are already at the destination
+    if is_destination(src[0], src[1], dest):
+        print("We are already at the destination")
+        return
 
-        self.grid[0][0].walls["top"] = False
-    def markAllAsUnvisited(self):
-        for y in range(self.size):
-            for x in range(self.size):
-                self.grid[x][y].visited=False
+    # Initialize the closed list (visited cells)
+    closed_list = [[False for _ in range(COL)] for _ in range(ROW)]
+    # Initialize the details of each cell
+    cell_details = [[Cell() for _ in range(COL)] for _ in range(ROW)]
 
+    # Initialize the start cell details
+    i = src[0]
+    j = src[1]
+    cell_details[i][j].f = 0
+    cell_details[i][j].g = 0
+    cell_details[i][j].h = 0
+    cell_details[i][j].parent_i = i
+    cell_details[i][j].parent_j = j
 
-    def isToTheRight(self,currCell,adjacentCell):
-        dx =  adjacentCell.x-currCell.x
-        result = dx == 1
+    # Initialize the open list (cells to be visited) with the start cell
+    open_list = []
+    heapq.heappush(open_list, (0.0, i, j))
 
-        #print("next cell to the right:", result)
-        return dx==1
+    # Initialize the flag for whether destination is found
+    found_dest = False
 
-    def isToTheLeft(self,currCell,adjacentCell):
-        dx =  adjacentCell.x-currCell.x
-        result = dx == -1
+    # Main loop of A* search algorithm
+    while len(open_list) > 0:
+        # Pop the cell with the smallest f value from the open list
+        p = heapq.heappop(open_list)
 
-        #print("next cell to the left:",result)
+        # Mark the cell as visited
+        i = p[1]
+        j = p[2]
+        closed_list[i][j] = True
 
-        return dx==-1
+        # For each direction, check the successors
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0), (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        for dir in directions:
+            new_i = i + dir[0]
+            new_j = j + dir[1]
 
-    def isToTheBottom(self,currCell,adjacentCell):
-        dy =  adjacentCell.y-currCell.y
-        result = dy == 1
+            # If the successor is valid, unblocked, and not visited
+            if is_valid(new_i, new_j) and is_unblocked(grid, new_i, new_j) and not closed_list[new_i][new_j]:
+                # If the successor is the destination
+                if is_destination(new_i, new_j, dest):
+                    # Set the parent of the destination cell
+                    cell_details[new_i][new_j].parent_i = i
+                    cell_details[new_i][new_j].parent_j = j
+                    print("The destination cell is found")
+                    # Trace and print the path from source to destination
+                    trace_path(cell_details, dest)
+                    found_dest = True
+                    return
+                else:
+                    # Calculate the new f, g, and h values
+                    g_new = cell_details[i][j].g + 1.0
+                    h_new = calculate_h_value(new_i, new_j, dest)
+                    f_new = g_new + h_new
 
-        #print("next cell to the bottom:",result)
+                    # If the cell is not in the open list or the new f value is smaller
+                    if cell_details[new_i][new_j].f == float('inf') or cell_details[new_i][new_j].f > f_new:
+                        # Add the cell to the open list
+                        heapq.heappush(open_list, (f_new, new_i, new_j))
+                        # Update the cell details
+                        cell_details[new_i][new_j].f = f_new
+                        cell_details[new_i][new_j].g = g_new
+                        cell_details[new_i][new_j].h = h_new
+                        cell_details[new_i][new_j].parent_i = i
+                        cell_details[new_i][new_j].parent_j = j
 
-        return dy ==1
-    def isToTheTop(self,currCell,adjacentCell):
-        dy =  adjacentCell.y-currCell.y
-        result = dy == -1
+    # If the destination is not found after visiting all cells
+    if not found_dest:
+        print("Failed to find the destination cell")
 
-        #print("next cell to the top:",result)
+def main():
+    # Define the grid (1 for unblocked, 0 for blocked)
+    grid = [
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 0],
+        [1, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 0, 0, 1]
+    ]
 
-        return dy==-1
-    def thereIsPath(self,currCell,adjacentCell):
-        if self.isToTheRight(currCell,adjacentCell) and not currCell.walls["right"]:
-         #   print (" there is a path to the right ")
+    # Define the source and destination
+    src = [8, 0]
+    dest = [0, 0]
 
-            return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
-        if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]:
-         #   print (" there is a path to the left ")
+    # Run the A* search algorithm
+    a_star_search(grid, src, dest)
 
-            return True
-
-        if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]:
-          #  print (" there is a path to the bottom ")
-
-            return True
-
-        if self.isToTheTop(currCell,adjacentCell) and not currCell.walls["top"]:
-           # print (" there is a path to the top ")
-            return True
-
-        return False #There is no path because a wall exists between the cell and its adjacent cell
-    def createLink(self,cell,adjacentCell):
-        if self.isToTheTop(cell,adjacentCell):
-            cell.links["top"]=True
-            adjacentCell.links["bottom"]=True
-
-        if self.isToTheBottom(cell, adjacentCell):
-            cell.links["bottom"] = True
-            adjacentCell.links["top"] = True
-
-        if self.isToTheRight(cell,adjacentCell):
-            cell.links["right"] = True
-            adjacentCell.links["left"] = True
-
-        if self.isToTheLeft(cell,adjacentCell):
-            cell.links["left"] = True
-            adjacentCell.links["right"] = True
-
-
-    def BFS (self):
-        self.resetLinks()
-        self.markAllAsUnvisited()
-        cell=self.grid[0][0]
-        queue=[]
-        #queue.append((cell,None))
-        queue.append(cell)
-        cell.visited=True
-        while len(queue)>0:
-           # pair=queue.pop(0)
-           # cell, pastCell = pair
-            cell=queue.pop(0)
-
-            for neighbour in cell.neighbours:
-                if neighbour.visited==False and self.thereIsPath(cell,neighbour):
-                    if neighbour.x==self.size-1 and neighbour.y==self.size-1:
-                        self.createLink(cell, neighbour)
-                        neighbour.links["bottom"]=True
-                        return
-#
-                    neighbour.visited=True
-                    self.createLink(cell,neighbour)
-                    yield
-                    #queue.append((neighbour,cell))
-                    queue.append(neighbour)
-    def resetLinks(self):
-        for x in range(self.size):
-            for y in range(self.size):
-                for link in self.grid[x][y].links:
-                    self.grid[x][y].links[link] = False
+if __name__ == "__main__":
+    main()
