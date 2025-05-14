@@ -22,7 +22,8 @@ font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insens
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+5,10,"Generate Maze: DFS")
 solveBFS=Button(screen,maze.width+5,45,"Solve Maze: BFS")
-reset=Button(screen,maze.width+5,150,"Reset Maze")
+solveGreedy = Button(screen, maze.width + 5, 150, "Solve Maze: GBFS") ###
+reset=Button(screen,maze.width+5,185,"Reset Maze")
 solveAstar=Button(screen,maze.width+5,115,"Solve Maze: A star")
 solveDFS=Button(screen,maze.width+5,80,"Solve Maze: DFS")
 #MESSAGES
@@ -71,6 +72,7 @@ def generateNewMaze(maze):
 
 dfs = maze.DFS()
 bfs = None
+greedy = None ###
 phase = ""
 dfs_done = False
 bfs_done = False
@@ -94,6 +96,10 @@ while running:
                 bfs = maze.BFS() #calls the method for the first time and yield causes it to return once a link is created between two cells
                 phase = "bfs"
 
+            elif solveGreedy.isClicked() and dfs_done:
+                greedy = maze.gbfs()  # Start Greedy algorithm
+                phase = "greedy"
+
             elif reset.isClicked():
                 phase = "reset"
 
@@ -114,6 +120,13 @@ while running:
             next(bfs)
         except StopIteration:
             phase = "idle"
+            
+    elif phase == "greedy":  # <-- GREEDY: Step-by-step solving ###
+        try:
+            next(greedy)
+        except StopIteration:
+            phase = "idle"
+
     elif phase=="reset":
         maze.resetMaze()
         dfs = maze.DFS()
@@ -126,6 +139,11 @@ while running:
     if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
         character.characterMovement(keys, maze)  # this method processes movement of character
         won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
+
+    elif not won and phase in ["bfs", "greedy"]:  # Allow movement during BFS or Greedy phases
+        character.characterMovement(keys, maze)  # Process character movement
+        won = character.mazeSolved(maze) # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
+    
     elif won:
         # if the user won, draw win msg
         character.resetDirections()
@@ -137,6 +155,7 @@ while running:
     reset.drawButton(screen)
     solveAstar.drawButton(screen)
     solveDFS.drawButton(screen)
+    solveGreedy.drawButton(screen)
     drawGrid()#draw grid
 
 

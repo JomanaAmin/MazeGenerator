@@ -1,7 +1,18 @@
 import random
+import heapq
+from itertools import count
+
 
 
 from Cell import Cell
+
+class Node:
+    def __init__(self, cell, cost):
+        self.cell = cell  # Store the Cell object
+        self.cost = cost  # Store the cost or the heuristic value
+
+    def __lt__(self, other):
+        return self.cost < other.cost
 
 
 class MazeGenerator:
@@ -192,3 +203,44 @@ class MazeGenerator:
             for y in range(self.size):
                 for link in self.grid[x][y].links:
                     self.grid[x][y].links[link] = False
+
+    def gbfs(self):
+    # Reset the visited and links information
+       self.resetLinks()
+       self.markAllAsUnvisited()
+ 
+    # Priority queue to store cells to be explored
+       open_list = []
+       counter = count()
+
+    
+    # Define a simple heuristic: Manhattan distance to the goal (bottom-right corner)
+       def heuristic(cell):
+           return abs(cell.x - (self.size - 1)) + abs(cell.y - (self.size - 1))
+    
+    # Start from the initial cell (top-left corner)
+       start_cell = self.grid[0][0]
+       start_cell.visited = True
+    
+    # Push the start cell into the priority queue with its heuristic
+       heapq.heappush(open_list, (heuristic(start_cell), next(counter), start_cell))
+    
+       while open_list:
+        # Pop the cell with the lowest heuristic value
+         _,  _, current_cell = heapq.heappop(open_list)
+
+        # If we reached the goal, stop
+         if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
+            return
+
+        # Explore each neighbor
+         for neighbour in current_cell.neighbours:
+             if not neighbour.visited and self.thereIsPath(current_cell, neighbour):
+                neighbour.visited = True
+                self.createLink(current_cell, neighbour)
+                
+                # Push the neighbour into the open list with its heuristic value
+                heapq.heappush(open_list, (heuristic(neighbour), next(counter), neighbour))
+        
+        # Yield after processing each cell to allow for visualization/animation
+         yield current_cell
