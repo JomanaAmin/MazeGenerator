@@ -99,7 +99,9 @@ while running:
             elif solveGreedy.isClicked() and dfs_done:
                 greedy = maze.gbfs()  # Start Greedy algorithm
                 phase = "greedy"
-
+            elif solveAstar.isClicked() and dfs_done:
+                Astar = maze.AStar()
+                phase = "Astar"
             elif reset.isClicked():
                 phase = "reset"
 
@@ -126,6 +128,12 @@ while running:
             next(greedy)
         except StopIteration:
             phase = "idle"
+    elif phase == "Astar":
+        try:
+            next(Astar)
+        except StopIteration:
+            phase = "idle"
+
 
     elif phase=="reset":
         maze.resetMaze()

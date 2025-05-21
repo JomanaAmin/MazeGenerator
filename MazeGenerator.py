@@ -2,7 +2,7 @@ import random
 import heapq
 from itertools import count
 
-
+from pygame.examples.midi import NullKey
 
 from Cell import Cell
 
@@ -24,6 +24,11 @@ class MazeGenerator:
         self.size=size
         self.length=length
         self.width=self.size*self.length
+        self.parent_x = 0
+        self.parent_y = 0
+        self.f = float('inf')
+        #self.g = float('inf')
+        self.h = 0
 
     def showGrid(self):
         #just prints the grid
@@ -142,7 +147,6 @@ class MazeGenerator:
             return True #returns true if the adjacent cell is to the right of current cell, and there is no wall between them
         if self.isToTheLeft(currCell,adjacentCell) and not currCell.walls["left"]:
          #   print (" there is a path to the left ")
-
             return True
 
         if self.isToTheBottom(currCell,adjacentCell) and not currCell.walls["bottom"]:
@@ -227,7 +231,7 @@ class MazeGenerator:
     
        while open_list:
         # Pop the cell with the lowest heuristic value
-         _,  _, current_cell = heapq.heappop(open_list)
+         _,  neighbour, current_cell = heapq.heappop(open_list)
 
         # If we reached the goal, stop
          if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
@@ -244,3 +248,32 @@ class MazeGenerator:
         
         # Yield after processing each cell to allow for visualization/animation
          yield current_cell
+    def AStar(self):
+        def calculate_f_value(cell):
+            return 1+((cell.x - (self.size - 1)) ** 2 + (cell.y - (self.size - 1)) ** 2) ** 0.5
+
+        open_list = []
+        cell= self.grid[0][0]
+        start_cell = self.grid[0][0]
+        start_cell.visited=False
+        past_cell=self.grid[0][0]
+        heapq.heappush(open_list, (calculate_f_value(start_cell),start_cell,past_cell))
+
+        while open_list:
+            f, neighbour, cell = heapq.heappop(open_list)
+            self.createLink(neighbour, cell)
+            for next_cell in neighbour.neighbours:
+
+                if next_cell.visited == False and self.thereIsPath(neighbour, next_cell):
+                    neighbour.visited = True
+
+                    if next_cell.x == self.size - 1 and next_cell.y == self.size - 1:
+                        self.createLink(neighbour, next_cell)
+                        next_cell.links["bottom"] = True
+                        return
+
+                    heapq.heappush(open_list, (calculate_f_value(next_cell), next_cell, neighbour))
+                    yield next_cell
+
+
+
