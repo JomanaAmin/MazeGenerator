@@ -30,6 +30,7 @@ class MazeGenerator:
         #self.g = float('inf')
         self.h = 0
 
+
     def showGrid(self):
         #just prints the grid
         for y in range(self.size):
@@ -249,31 +250,55 @@ class MazeGenerator:
         # Yield after processing each cell to allow for visualization/animation
          yield current_cell
     def AStar(self):
-        def calculate_f_value(cell):
-            return 1+((cell.x - (self.size - 1)) ** 2 + (cell.y - (self.size - 1)) ** 2) ** 0.5
+        def is_destination(cell):
+            return cell.x == self.size - 1 and cell.y == self.size - 1
+        def calculate_h_value(cell):
+            return ((cell.x - (self.size - 1)) ** 2 + (cell.y - (self.size - 1)) ** 2) ** 0.5
+        def calculate_g_value(cell,next_cell):
+            return ((cell.x - next_cell.x) **2 + (cell.y- next_cell.y) **2) ** 0.5
+        def calculate_f_value(next_cell,cell):
+            return calculate_h_value(next_cell)+calculate_g_value(cell,next_cell)
 
+
+        counter = count()
         open_list = []
+        came_from = {}
         cell= self.grid[0][0]
         start_cell = self.grid[0][0]
         start_cell.visited=False
         past_cell=self.grid[0][0]
-        heapq.heappush(open_list, (calculate_f_value(start_cell),start_cell,past_cell))
+        heapq.heappush(open_list, (calculate_f_value(start_cell,start_cell),next(counter),start_cell,past_cell))
 
         while open_list:
-            f, neighbour, cell = heapq.heappop(open_list)
-            self.createLink(neighbour, cell)
-            for next_cell in neighbour.neighbours:
+            f, counting, current, cell = heapq.heappop(open_list)
+          #  self.createLink(current, cell)
+            for next_cell in current.neighbours:
 
-                if next_cell.visited == False and self.thereIsPath(neighbour, next_cell):
-                    neighbour.visited = True
+               # print(calculate_g_value(current,next_cell))
+                if next_cell.visited == False and self.thereIsPath(current, next_cell):
+                    current.visited = True
+                    came_from[next_cell] = current
 
-                    if next_cell.x == self.size - 1 and next_cell.y == self.size - 1:
-                        self.createLink(neighbour, next_cell)
+                    if is_destination(next_cell):
+
+                      #  self.createLink(current, next_cell)
+                       # print("you made it")
+                        path=[]
+
+                        temp=next_cell
+                        while temp in came_from and temp !=start_cell:
+                            path.append(temp)
+                            temp=came_from.get(temp)
+                            #print(temp)
+                       # print(temp , "gggggg")
+                        path.append(start_cell)
+                        path.reverse()
+                        for i in range(len(path)-1):
+                            self.createLink(path[i],path[i+1])
+                            yield
                         next_cell.links["bottom"] = True
+
                         return
-
-                    heapq.heappush(open_list, (calculate_f_value(next_cell), next_cell, neighbour))
+                    heapq.heappush(open_list, (calculate_f_value(next_cell,current),next(counter), next_cell, current))
                     yield next_cell
-
-
 
