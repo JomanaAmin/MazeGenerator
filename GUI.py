@@ -1,6 +1,4 @@
-import random
 import pygame
-from pygame import Rect, key
 from Character import Character
 from Button import Button
 
@@ -73,12 +71,13 @@ def generateNewMaze(maze):
 dfs = maze.DFS()
 bfs = None
 greedy = None ###
+Astar=None
 phase = ""
 dfs_done = False
 bfs_done = False
 won=False
 while running:
-    screen.fill("grey")  # Clear screen
+    screen.fill("grey")
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT: #if user clicks on the X
@@ -97,11 +96,13 @@ while running:
                 phase = "bfs"
 
             elif solveGreedy.isClicked() and dfs_done:
-                greedy = maze.gbfs()  # Start Greedy algorithm
+                greedy = maze.gbfs()
                 phase = "greedy"
+
             elif solveAstar.isClicked() and dfs_done:
                 Astar = maze.AStar()
                 phase = "Astar"
+
             elif reset.isClicked():
                 phase = "reset"
 
@@ -123,7 +124,7 @@ while running:
         except StopIteration:
             phase = "idle"
             
-    elif phase == "greedy":  # <-- GREEDY: Step-by-step solving ###
+    elif phase == "greedy":
         try:
             next(greedy)
         except StopIteration:
@@ -133,8 +134,6 @@ while running:
             next(Astar)
         except StopIteration:
             phase = "idle"
-
-
     elif phase=="reset":
         maze.resetMaze()
         dfs = maze.DFS()
@@ -148,7 +147,7 @@ while running:
         character.characterMovement(keys, maze)  # this method processes movement of character
         won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
 
-    elif not won and phase in ["bfs", "greedy"]:  # Allow movement during BFS or Greedy phases
+    elif not won and phase in ["bfs", "greedy", "Astar"]:  # Allow movement during BFS or Greedy phases
         character.characterMovement(keys, maze)  # Process character movement
         won = character.mazeSolved(maze) # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
     

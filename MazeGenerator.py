@@ -31,12 +31,7 @@ class MazeGenerator:
         self.h = 0
 
 
-    def showGrid(self):
-        #just prints the grid
-        for y in range(self.size):
-            for x in range(self.size):
-                print("X:",x,"Y:",y)
-                print("CELL: ", self.grid[x][y].x, self.grid[x][y].y)
+
 
     def generateNeighbours(self):
       #  print("GENERATING NEIGHBOURS")
@@ -250,6 +245,8 @@ class MazeGenerator:
         # Yield after processing each cell to allow for visualization/animation
          yield current_cell
     def AStar(self):
+        self.resetLinks()
+        self.markAllAsUnvisited()
         def is_destination(cell):
             return cell.x == self.size - 1 and cell.y == self.size - 1
         def calculate_h_value(cell):
