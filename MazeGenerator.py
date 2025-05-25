@@ -231,6 +231,7 @@ class MazeGenerator:
 
         # If we reached the goal, stop
          if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
+            current_cell.links["bottom"] = True
             return
 
         # Explore each neighbor
@@ -268,7 +269,8 @@ class MazeGenerator:
 
         while open_list:
             f, counting, current, cell = heapq.heappop(open_list)
-          #  self.createLink(current, cell)
+            self.createLink(current, cell)
+            yield
             for next_cell in current.neighbours:
 
                # print(calculate_g_value(current,next_cell))
@@ -278,7 +280,7 @@ class MazeGenerator:
 
                     if is_destination(next_cell):
 
-                      #  self.createLink(current, next_cell)
+                        #self.createLink(current, next_cell)
                        # print("you made it")
                         path=[]
 
@@ -290,6 +292,7 @@ class MazeGenerator:
                        # print(temp , "gggggg")
                         path.append(start_cell)
                         path.reverse()
+                        self.resetLinks()
                         for i in range(len(path)-1):
                             self.createLink(path[i],path[i+1])
                             yield
@@ -299,3 +302,27 @@ class MazeGenerator:
                     heapq.heappush(open_list, (calculate_f_value(next_cell,current),next(counter), next_cell, current))
                     yield next_cell
 
+
+    def solvingDFS(self):
+        self.markAllAsUnvisited()
+        self.resetLinks()
+        stack=[]
+        pastCell=None
+        cell=self.grid[0][0]
+        stack.append((cell,pastCell))
+        while len(stack)>0:
+            pair=stack.pop()
+            cell, pastCell = pair
+
+            if cell.visited==False:
+                cell.visited=True
+                if pastCell!=None and self.thereIsPath(cell, pastCell):
+                    self.createLink(cell, pastCell)
+                    yield
+                if cell.x == self.size - 1 and cell.y == self.size - 1:
+                    cell.links["bottom"] = True
+                    return
+                pastCell=cell
+                for neighbour in cell.neighbours:
+                    if self.thereIsPath(cell, neighbour):
+                        stack.append((neighbour,pastCell))

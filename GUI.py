@@ -19,16 +19,17 @@ screen = pygame.display.set_mode((screenWidth, screenHeight))
 font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insensitive
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+5,10,"Generate Maze: DFS")
-solveBFS=Button(screen,maze.width+5,45,"Solve Maze: BFS")
-solveGreedy = Button(screen, maze.width + 5, 150, "Solve Maze: GBFS") ###
-reset=Button(screen,maze.width+5,185,"Reset Maze")
-solveAstar=Button(screen,maze.width+5,115,"Solve Maze: A star")
-solveDFS=Button(screen,maze.width+5,80,"Solve Maze: DFS")
+generateMazeBFS=Button(screen,maze.width+5,45,"Generate Maze: BFS")
+solveBFS=Button(screen,maze.width+5,80,"Solve Maze: BFS")
+solveGreedy = Button(screen, maze.width + 5, 185, "Solve Maze: GBFS") ###
+reset=Button(screen,maze.width+5,220,"Reset Maze")
+solveAstar=Button(screen,maze.width+5,150,"Solve Maze: A star")
+solveDFS=Button(screen,maze.width+5,115,"Solve Maze: DFS")
 #MESSAGES
 win_msg = font.render("You Won!", True, "Black")
 
 def drawGridPath():
-    pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2), 5)
+    #pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2), 5)
     for y in range(size):
         for x in range (size):
             drawLink(maze.grid[x][y])
@@ -69,8 +70,9 @@ def generateNewMaze(maze):
 
 
 dfs = maze.DFS()
+solvingDFS=None
 bfs = None
-greedy = None ###
+greedy = None
 Astar=None
 phase = ""
 dfs_done = False
@@ -102,6 +104,9 @@ while running:
             elif solveAstar.isClicked() and dfs_done:
                 Astar = maze.AStar()
                 phase = "Astar"
+            elif solveDFS.isClicked() and dfs_done:
+                solvingDFS=maze.solvingDFS()
+                phase="solvingDFS"
 
             elif reset.isClicked():
                 phase = "reset"
@@ -134,6 +139,11 @@ while running:
             next(Astar)
         except StopIteration:
             phase = "idle"
+    elif phase == "solvingDFS":
+        try:
+            next(solvingDFS)
+        except StopIteration:
+            phase = "idle"
     elif phase=="reset":
         maze.resetMaze()
         dfs = maze.DFS()
@@ -147,7 +157,7 @@ while running:
         character.characterMovement(keys, maze)  # this method processes movement of character
         won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
 
-    elif not won and phase in ["bfs", "greedy", "Astar"]:  # Allow movement during BFS or Greedy phases
+    elif not won and phase in ["bfs", "greedy", "Astar","solvingDFS"]:  # Allow movement during BFS or Greedy phases
         character.characterMovement(keys, maze)  # Process character movement
         won = character.mazeSolved(maze) # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
     
@@ -158,6 +168,7 @@ while running:
 
     #drawing buttons
     generateMazeDFS.drawButton(screen)
+    generateMazeBFS.drawButton(screen)
     solveBFS.drawButton(screen)
     reset.drawButton(screen)
     solveAstar.drawButton(screen)
@@ -172,5 +183,5 @@ while running:
 
     pygame.display.update()#updates screen each frame
 
-    clock.tick(27)
+    clock.tick(20)
 pygame.quit()

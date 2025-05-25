@@ -15,27 +15,33 @@ class Character:
         self.walkRight = [
             pygame.image.load(r"sprite/right/right1.png"),
             pygame.image.load(r"sprite/right/right2.png"),
-            pygame.image.load(r"sprite/right/right3.png")
+            pygame.image.load(r"sprite/right/right3.png"),
+            pygame.image.load(r"sprite/right/right4.png"),
         ]
 
         self.walkLeft = [
             pygame.image.load(r"sprite/left/left1.png"),
             pygame.image.load(r"sprite/left/left2.png"),
-            pygame.image.load(r"sprite/left/left3.png")
+            pygame.image.load(r"sprite/left/left3.png"),
+            pygame.image.load(r"sprite/left/left4.png"),
         ]
 
         self.walkUp = [
             pygame.image.load(r"sprite/up/up1.png"),
             pygame.image.load(r"sprite/up/up2.png"),
             pygame.image.load(r"sprite/up/up3.png"),
+            pygame.image.load(r"sprite/up/up4.png")
         ]
 
         self.walkDown = [
             pygame.image.load(r"sprite/down/down1.png"),
             pygame.image.load(r"sprite/down/down2.png"),
-            pygame.image.load(r"sprite/down/down3.png")
+            pygame.image.load(r"sprite/down/down3.png"),
+            pygame.image.load(r"sprite/down/down4.png")
         ]
-        self.idle=pygame.image.load(r"sprite/idle/idle1.png")
+        self.idle=[pygame.image.load(r"sprite/idle/idle1.png"),
+                   pygame.image.load(r"sprite/idle/idle2.png"),
+                   pygame.image.load(r"sprite/idle/idle3.png")]
         self.walkCount=0
 
     def mazeSolved(self,maze):
@@ -60,31 +66,31 @@ class Character:
         elif key[pygame.K_DOWN]:
             nextCellY += 1  # move down
 
-        # Bounds checking: Ensure next cell is within the grid limits
+        # ensuring next cell is within the grid limits
         if not (0 <= nextCellX < maze.size and 0 <= nextCellY < maze.size):
             return False  # next cell is out of bounds
 
-        # Get the current and next cell objects from the grid
+        # get the current and next cell objects from the grid
         currCell = maze.grid[currCellX][currCellY]
         nextCell = maze.grid[nextCellX][nextCellY]
         print(f"Current cell: [{currCellX},{currCellY}]")
         print(f"next cell: [{nextCellX},{nextCellY}]")
         print(f"Cell walls: {maze.grid[currCellX][currCellY].walls}")
-        # Check if there is a valid path between the current and next cell
+        # check if there is a valid path between the current and next cell
         return maze.thereIsPath(currCell, nextCell)
     def animate(self,screen):
         if self.walkCount>=26:
             self.walkCount=0
         if self.direction["up"]:
-            screen.blit(self.walkUp[self.walkCount%3],(self.x,self.y))
+            screen.blit(self.walkUp[self.walkCount%4],(self.x,self.y))
         elif self.direction["down"]:
-            screen.blit(self.walkDown[self.walkCount%3],(self.x,self.y))
+            screen.blit(self.walkDown[self.walkCount%4],(self.x,self.y))
         elif self.direction["left"]:
-            screen.blit(self.walkLeft[self.walkCount%3],(self.x,self.y))
+            screen.blit(self.walkLeft[self.walkCount%4],(self.x,self.y))
         elif self.direction["right"]:
-            screen.blit(self.walkRight[self.walkCount%3],(self.x,self.y))
+            screen.blit(self.walkRight[self.walkCount%4],(self.x,self.y))
         else:
-            screen.blit(self.idle,(self.x,self.y))
+            screen.blit(self.idle[self.walkCount%3],(self.x,self.y))
     def reset(self):
         self.x = 0
         self.y = 0
@@ -126,7 +132,7 @@ class Character:
             self.direction["right"] = False
             self.direction["up"] = False
             self.direction["down"] = False
-            self.walkCount = 0
+            self.walkCount =0
 
     def resetDirections(self):
         self.direction={
