@@ -23,7 +23,7 @@ pygame.time.set_timer(timer,1000)
 
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
-generateMazeBFS=Button(screen,maze.width+length,45,"Generate Maze: ..",screenWidth-maze.width-3*length/2)
+clearMaze=Button(screen,maze.width+length,45,"Clear Maze",screenWidth-maze.width-3*length/2)
 solveBFS=Button(screen,maze.width+length,80,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
 solveGreedy = Button(screen, maze.width +length, 185, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
 reset=Button(screen,maze.width+length,220,"Reset Maze",screenWidth-maze.width-3*length/2)
@@ -71,7 +71,8 @@ def drawCell(cell):
 def generateNewMaze(maze):
     maze.resetMaze()
     maze.DFS()
-
+def clearPath(maze):
+    maze.resetLinks()
 
 dfs = maze.DFS()
 solvingDFS=None
@@ -90,7 +91,7 @@ while running:
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
             if generateMazeDFS.isClicked():
-                maze.resetMaze() #resets maze to original gird
+                maze.resetMaze() #resets maze to original grid
                 dfs = maze.DFS() #calls the function and "yield" stops when a wall gets removed
                 dfs_done = False #since we are starting a new dfs maze, set dfs_done to false, this ensures that player cant move yet and that bfs wont run yet
                 character.reset(length/2) #return character to start position
@@ -111,6 +112,8 @@ while running:
             elif solveDFS.isClicked() and dfs_done:
                 solvingDFS=maze.solvingDFS()
                 phase="solvingDFS"
+            elif clearMaze.isClicked() and phase not in ["dfs","bfs","Astar","solvingDFS", "greedy"]:
+                maze.resetLinks()
 
             elif reset.isClicked():
                 phase = "reset"
@@ -156,7 +159,6 @@ while running:
         character.reset(length/2)
         won = False
         phase = "idle"
-
     if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
         character.characterMovement(keys, maze)  # this method processes movement of character
         won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
@@ -172,7 +174,7 @@ while running:
 
     #drawing buttons
     generateMazeDFS.drawButton(screen)
-    generateMazeBFS.drawButton(screen)
+    clearMaze.drawButton(screen)
     solveBFS.drawButton(screen)
     reset.drawButton(screen)
     solveAstar.drawButton(screen)
