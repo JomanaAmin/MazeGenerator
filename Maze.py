@@ -1,9 +1,6 @@
 import random
 import heapq
 from itertools import count
-
-from pygame.examples.midi import NullKey
-
 from Cell import Cell
 
 class Maze:
