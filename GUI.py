@@ -2,7 +2,7 @@ import pygame
 from Character import Character
 from Button import Button
 
-from MazeGenerator import MazeGenerator
+from Maze import Maze
 pygame.init()
 pygame.display.set_caption("Maze Game")
 clock = pygame.time.Clock()
@@ -10,21 +10,25 @@ running = True
 length=25
 size=10
 trials=0
-maze=MazeGenerator(size,length)
-character=Character(maze,0,0)
+maze=Maze(size,length)
+character=Character(maze,length/2,length/2)
 #DIMENSIONS
 screenWidth = maze.width + 200
 screenHeight = maze.width + 70
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insensitive
+
+timer=pygame.event.custom_type()
+pygame.time.set_timer(timer,1000)
+
 #BUTTONS
-generateMazeDFS=Button(screen,maze.width+5,10,"Generate Maze: DFS")
-generateMazeBFS=Button(screen,maze.width+5,45,"Generate Maze: BFS")
-solveBFS=Button(screen,maze.width+5,80,"Solve Maze: BFS")
-solveGreedy = Button(screen, maze.width + 5, 185, "Solve Maze: GBFS") ###
-reset=Button(screen,maze.width+5,220,"Reset Maze")
-solveAstar=Button(screen,maze.width+5,150,"Solve Maze: A star")
-solveDFS=Button(screen,maze.width+5,115,"Solve Maze: DFS")
+generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
+generateMazeBFS=Button(screen,maze.width+length,45,"Generate Maze: ..",screenWidth-maze.width-3*length/2)
+solveBFS=Button(screen,maze.width+length,80,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
+solveGreedy = Button(screen, maze.width +length, 185, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
+reset=Button(screen,maze.width+length,220,"Reset Maze",screenWidth-maze.width-3*length/2)
+solveAstar=Button(screen,maze.width+length,150,"Solve Maze: A star",screenWidth-maze.width-3*length/2)
+solveDFS=Button(screen,maze.width+length,115,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
 #MESSAGES
 win_msg = font.render("You Won!", True, "Black")
 
@@ -37,8 +41,8 @@ def drawGridPath():
 def drawLink(cell):
     x=cell.x
     y=cell.y
-    centerX=x*length+length/2
-    centerY=y*length+length/2
+    centerX=x*length+length
+    centerY=y*length+length
     if cell.links["left"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX-length,centerY),5)
     if cell.links["right"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX+length,centerY),5)
     if cell.links["top"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY-length),5)
@@ -53,15 +57,15 @@ def drawCell(cell):
     x=cell.x
     y=cell.y
     if cell.walls["top"]:
-        pygame.draw.line(screen, (255,255,255), (x*length, y*length), ((x+1)*length, y*length))
+        pygame.draw.line(screen, (255,255,255), (x*length+length/2, y*length+length/2), ((x+1)*length+length/2, y*length+length/2))
     if cell.walls["bottom"]:
-        pygame.draw.line(screen, (255,255,255), (x*length, (y+1) *length), ((x+1)*length, (y+1)*length))
+        pygame.draw.line(screen, (255,255,255), (x*length+length/2, (y+1) *length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
     if cell.walls["left"]:
-        pygame.draw.line(screen, (255,255,255), (x*length, y*length), (x*length, (y+1)*length))
+        pygame.draw.line(screen, (255,255,255), (x*length+length/2, y*length+length/2), (x*length+length/2, (y+1)*length+length/2))
 
     if cell.walls["right"]:
-        pygame.draw.line(screen, (255,255,255), ((x+1)*length, y*length), ((x+1)*length, (y+1)*length))
+        pygame.draw.line(screen, (255,255,255), ((x+1)*length+length/2, y*length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
 
 def generateNewMaze(maze):
@@ -89,7 +93,7 @@ while running:
                 maze.resetMaze() #resets maze to original gird
                 dfs = maze.DFS() #calls the function and "yield" stops when a wall gets removed
                 dfs_done = False #since we are starting a new dfs maze, set dfs_done to false, this ensures that player cant move yet and that bfs wont run yet
-                character.reset() #return character to start position
+                character.reset(length/2) #return character to start position
                 won = False #set won to false since we are JUST starting a new maze
                 phase = "dfs" #set phase to dfs, since we are currently generating
 
@@ -149,7 +153,7 @@ while running:
         dfs = maze.DFS()
         bfs = None
         dfs_done = False
-        character.reset()
+        character.reset(length/2)
         won = False
         phase = "idle"
 

@@ -73,9 +73,9 @@ class Character:
         # get the current and next cell objects from the grid
         currCell = maze.grid[currCellX][currCellY]
         nextCell = maze.grid[nextCellX][nextCellY]
-        print(f"Current cell: [{currCellX},{currCellY}]")
-        print(f"next cell: [{nextCellX},{nextCellY}]")
-        print(f"Cell walls: {maze.grid[currCellX][currCellY].walls}")
+        #print(f"Current cell: [{currCellX},{currCellY}]")
+        #print(f"next cell: [{nextCellX},{nextCellY}]")
+        #print(f"Cell walls: {maze.grid[currCellX][currCellY].walls}")
         # check if there is a valid path between the current and next cell
         return maze.thereIsPath(currCell, nextCell)
     def animate(self,screen):
@@ -91,9 +91,9 @@ class Character:
             screen.blit(self.walkRight[self.walkCount%4],(self.x,self.y))
         else:
             screen.blit(self.idle[self.walkCount%3],(self.x,self.y))
-    def reset(self):
-        self.x = 0
-        self.y = 0
+    def reset(self,pos):
+        self.x = pos
+        self.y = pos
     def characterMovement(self,keys,maze):
 
         if keys[pygame.K_LEFT] and self.x > 0 and self.canPass(maze, keys):

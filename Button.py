@@ -1,10 +1,10 @@
 import pygame
 class Button:
-    def __init__(self,screen,x,y,msg):
+    def __init__(self,screen,x,y,msg,wid):
         self.screen = screen
         self.x = x
         self.y = y
-        self.width = 190
+        self.width = wid
         self.height = 30
         self.rect=pygame.Rect(x,y,self.width,self.height,) #creates a rectangle surface for button
         self.msg=msg

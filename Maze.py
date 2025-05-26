@@ -6,16 +6,7 @@ from pygame.examples.midi import NullKey
 
 from Cell import Cell
 
-class Node:
-    def __init__(self, cell, cost):
-        self.cell = cell  # Store the Cell object
-        self.cost = cost  # Store the cost or the heuristic value
-
-    def __lt__(self, other):
-        return self.cost < other.cost
-
-
-class MazeGenerator:
+class Maze:
     def __init__(self,size,length):
         self.size=size
         self.grid=[[Cell(x,y) for y in range(size)] for x in range(size)]
@@ -24,11 +15,11 @@ class MazeGenerator:
         self.size=size
         self.length=length
         self.width=self.size*self.length
-        self.parent_x = 0
-        self.parent_y = 0
-        self.f = float('inf')
+        #self.parent_x = 0
+        #self.parent_y = 0
+        #self.f = float('inf')
         #self.g = float('inf')
-        self.h = 0
+        #self.h = 0
 
 
 
@@ -172,7 +163,6 @@ class MazeGenerator:
             cell.links["left"] = True
             adjacentCell.links["right"] = True
 
-
     def BFS (self):
         self.resetLinks()
         self.markAllAsUnvisited()
@@ -205,46 +195,47 @@ class MazeGenerator:
                     self.grid[x][y].links[link] = False
 
     def gbfs(self):
-    # Reset the visited and links information
-       self.resetLinks()
-       self.markAllAsUnvisited()
- 
-    # Priority queue to store cells to be explored
-       open_list = []
-       counter = count()
+        # Reset the visited and links information
+        self.resetLinks()
+        self.markAllAsUnvisited()
 
-    
-    # Define a simple heuristic: Manhattan distance to the goal (bottom-right corner)
-       def heuristic(cell):
-           return abs(cell.x - (self.size - 1)) + abs(cell.y - (self.size - 1))
-    
-    # Start from the initial cell (top-left corner)
-       start_cell = self.grid[0][0]
-       start_cell.visited = True
-    
-    # Push the start cell into the priority queue with its heuristic
-       heapq.heappush(open_list, (heuristic(start_cell), next(counter), start_cell))
-    
-       while open_list:
-        # Pop the cell with the lowest heuristic value
-         _,  neighbour, current_cell = heapq.heappop(open_list)
+        # Priority queue to store cells to be explored
+        open_list = []
+        counter = count()
+        pastCell=None
 
-        # If we reached the goal, stop
-         if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
-            current_cell.links["bottom"] = True
-            return
+        # Define a simple heuristic: Manhattan distance to the goal (bottom-right corner)
+        def heuristic(cell):
+            return abs(cell.x - (self.size - 1)) + abs(cell.y - (self.size - 1))
 
-        # Explore each neighbor
-         for neighbour in current_cell.neighbours:
-             if not neighbour.visited and self.thereIsPath(current_cell, neighbour):
-                neighbour.visited = True
-                self.createLink(current_cell, neighbour)
-                
-                # Push the neighbour into the open list with its heuristic value
-                heapq.heappush(open_list, (heuristic(neighbour), next(counter), neighbour))
-        
+        # Start from the initial cell (top-left corner)
+        start_cell = self.grid[0][0]
+        start_cell.visited = True
+        # Push the start cell into the priority queue with its heuristic
+        heapq.heappush(open_list, (heuristic(start_cell), next(counter), start_cell, pastCell))
+
+        while open_list:
+            # Pop the cell with the lowest heuristic value
+            _,  neighbour, current_cell, pastCell = heapq.heappop(open_list)
+
+            if pastCell is not None:
+                self.createLink(current_cell, pastCell)
+                yield current_cell
+
+            # If we reached the goal, stop
+            if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
+                current_cell.links["bottom"] = True
+                return
+
+            # Explore each neighbor
+            for neighbour in current_cell.neighbours:
+                if not neighbour.visited and self.thereIsPath(current_cell, neighbour):
+                    neighbour.visited = True
+                    # Push the neighbour into the open list with its heuristic value
+                    heapq.heappush(open_list, (heuristic(neighbour), next(counter), neighbour,current_cell))
+
         # Yield after processing each cell to allow for visualization/animation
-         yield current_cell
+
     def AStar(self):
         self.resetLinks()
         self.markAllAsUnvisited()
@@ -323,6 +314,11 @@ class MazeGenerator:
                     cell.links["bottom"] = True
                     return
                 pastCell=cell
+                unvisited=[]
                 for neighbour in cell.neighbours:
                     if self.thereIsPath(cell, neighbour):
-                        stack.append((neighbour,pastCell))
+                        #stack.append((neighbour,pastCell)) #comment out
+                        unvisited.append(neighbour)
+                random.shuffle(unvisited)
+                for n in unvisited:
+                    stack.append((n,pastCell))
