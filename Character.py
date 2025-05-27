@@ -78,6 +78,7 @@ class Character:
         #print(f"Cell walls: {maze.grid[currCellX][currCellY].walls}")
         # check if there is a valid path between the current and next cell
         return maze.thereIsPath(currCell, nextCell)
+
     def animate(self,screen):
         if self.walkCount>=26:
             self.walkCount=0
@@ -91,11 +92,12 @@ class Character:
             screen.blit(self.walkRight[self.walkCount%4],(self.x,self.y))
         else:
             screen.blit(self.idle[self.walkCount%3],(self.x,self.y))
+
     def reset(self,pos):
         self.x = pos
         self.y = pos
-    def characterMovement(self,keys,maze):
 
+    def characterMovement(self,keys,maze):
         if keys[pygame.K_LEFT] and self.x > 0 and self.canPass(maze, keys):
             self.direction["left"] = True
             self.direction["right"] = False

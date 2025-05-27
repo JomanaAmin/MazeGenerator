@@ -6,7 +6,7 @@ class Button:
         self.y = y
         self.width = wid
         self.height = 30
-        self.rect=pygame.Rect(x,y,self.width,self.height,) #creates a rectangle surface for button
+        self.rect=pygame.Rect(x,y,self.width,self.height) #creates a rectangle surface for button
         self.msg=msg
         self.font=font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insensitive
         self.text=self.font.render(msg,True,"White","pink") #render some text returns a surface with this text

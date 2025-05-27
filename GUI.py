@@ -1,8 +1,11 @@
+import time
+
 import pygame
 from Character import Character
 from Button import Button
 
 from Maze import Maze
+from timer import Timer
 pygame.init()
 pygame.display.set_caption("Maze Game")
 clock = pygame.time.Clock()
@@ -16,10 +19,9 @@ character=Character(maze,length/2,length/2)
 screenWidth = maze.width + 200
 screenHeight = maze.width + 70
 screen = pygame.display.set_mode((screenWidth, screenHeight))
-font = pygame.font.SysFont("timesnewroman", 17,True)  # Font name is case-insensitive
+font = pygame.font.SysFont("timesnewroman", 25,True)  # Font name is case-insensitive
 
-timer=pygame.event.custom_type()
-pygame.time.set_timer(timer,1000)
+timer=Timer(20,screen,length*2,maze.width+length)
 
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
@@ -67,12 +69,6 @@ def drawCell(cell):
     if cell.walls["right"]:
         pygame.draw.line(screen, (255,255,255), ((x+1)*length+length/2, y*length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
-
-def generateNewMaze(maze):
-    maze.resetMaze()
-    maze.DFS()
-def clearPath(maze):
-    maze.resetLinks()
 
 dfs = maze.DFS()
 solvingDFS=None
@@ -171,7 +167,8 @@ while running:
         # if the user won, draw win msg
         character.resetDirections()
         screen.blit(win_msg, (screenWidth / 2 - 50, maze.width + 20))
-
+    #timer.updateTimer()
+    #timer.drawTimer()
     #drawing buttons
     generateMazeDFS.drawButton(screen)
     clearMaze.drawButton(screen)

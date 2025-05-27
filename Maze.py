@@ -2,7 +2,7 @@ import random
 import heapq
 from itertools import count
 from Cell import Cell
-
+import time
 class Maze:
     def __init__(self,size,length):
         self.size=size
@@ -12,14 +12,6 @@ class Maze:
         self.size=size
         self.length=length
         self.width=self.size*self.length
-        #self.parent_x = 0
-        #self.parent_y = 0
-        #self.f = float('inf')
-        #self.g = float('inf')
-        #self.h = 0
-
-
-
 
     def generateNeighbours(self):
       #  print("GENERATING NEIGHBOURS")
@@ -27,7 +19,7 @@ class Maze:
        #     print("NEIGHBOURS:",y)
             for x in range(self.size):
                 cell=self.grid[x][y]
-                print(cell.x,cell.y)
+                #print(cell.x,cell.y)
                 if y-1>=0 :#top neighbour
                     cell.neighbours.append(self.grid[x][y-1])
         #            print("top neighbour: ",self.grid[x][y-1].x,self.grid[x][y-1].y)
@@ -75,7 +67,10 @@ class Maze:
                     self.removeWall(cell, pastCell)
                 yield
                 pastCell=cell
-                unvisited=[neighbour for neighbour in cell.neighbours]
+                unvisited=[]
+                for neighbour in cell.neighbours:
+                    if neighbour.visited==False:
+                        unvisited.append(neighbour)
                 random.shuffle(unvisited)
                 for neighbour in unvisited:
                     stack.append((neighbour,pastCell))
@@ -169,10 +164,7 @@ class Maze:
         queue.append(cell)
         cell.visited=True
         while len(queue)>0:
-           # pair=queue.pop(0)
-           # cell, pastCell = pair
             cell=queue.pop(0)
-
             for neighbour in cell.neighbours:
                 if neighbour.visited==False and self.thereIsPath(cell,neighbour):
                     if neighbour.x==self.size-1 and neighbour.y==self.size-1:
@@ -183,7 +175,6 @@ class Maze:
                     neighbour.visited=True
                     self.createLink(cell,neighbour)
                     yield
-                    #queue.append((neighbour,cell))
                     queue.append(neighbour)
     def resetLinks(self):
         for x in range(self.size):
@@ -213,11 +204,11 @@ class Maze:
 
         while open_list:
             # Pop the cell with the lowest heuristic value
-            _,  neighbour, current_cell, pastCell = heapq.heappop(open_list)
+            _,  _, current_cell, pastCell = heapq.heappop(open_list)
 
             if pastCell is not None:
                 self.createLink(current_cell, pastCell)
-                yield current_cell
+                yield
 
             # If we reached the goal, stop
             if current_cell.x == self.size - 1 and current_cell.y == self.size - 1:
@@ -267,8 +258,7 @@ class Maze:
                     came_from[next_cell] = current
 
                     if is_destination(next_cell):
-
-                        #self.createLink(current, next_cell)
+                        self.createLink(current, next_cell)
                        # print("you made it")
                         path=[]
 
@@ -288,7 +278,7 @@ class Maze:
 
                         return
                     heapq.heappush(open_list, (calculate_f_value(next_cell,current),next(counter), next_cell, current))
-                    yield next_cell
+                    #yield next_cell
 
 
     def solvingDFS(self):
@@ -313,9 +303,33 @@ class Maze:
                 pastCell=cell
                 unvisited=[]
                 for neighbour in cell.neighbours:
-                    if self.thereIsPath(cell, neighbour):
+                    if self.thereIsPath(cell, neighbour) and neighbour.visited==False:
                         #stack.append((neighbour,pastCell)) #comment out
                         unvisited.append(neighbour)
                 random.shuffle(unvisited)
                 for n in unvisited:
                     stack.append((n,pastCell))
+
+#code for testing empirical analysis
+#
+# testMaze=Maze(100,10) #created maze with 100*100 cells
+# startTime=time.time()
+# testMaze.DFS()
+# endTime=time.time()
+# print(f"Time for DFS algorithm: {endTime-startTime :.6f}seconds")
+# startTime=time.time()
+# testMaze.BFS()
+# endTime=time.time()
+# print(f"Time for BFS solving algorithm: {endTime-startTime :.6f}seconds")
+# startTime=time.time()
+# testMaze.solvingDFS()
+# endTime=time.time()
+# print(f"Time for DFS maze solving algorithm: {endTime-startTime :.6f}seconds")
+# startTime=time.time()
+# testMaze.gbfs()
+# endTime=time.time()
+# print(f"Time for Greedy algorithm: {endTime-startTime :.6f}seconds")
+# startTime=time.time()
+# testMaze.AStar()
+# endTime=time.time()
+# print(f"Time for A star algorithm: {endTime-startTime :.6f}seconds")
