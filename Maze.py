@@ -167,13 +167,11 @@ class Maze:
             cell=queue.pop(0)
             for neighbour in cell.neighbours:
                 if neighbour.visited==False and self.thereIsPath(cell,neighbour):
-                    if neighbour.x==self.size-1 and neighbour.y==self.size-1:
-                        self.createLink(cell, neighbour)
-                        neighbour.links["bottom"]=True
-                        return
-#
                     neighbour.visited=True
                     self.createLink(cell,neighbour)
+                    if neighbour.x == self.size - 1 and neighbour.y == self.size - 1:
+                        neighbour.links["bottom"] = True
+                        return #returns if its the end of the maze
                     yield
                     queue.append(neighbour)
     def resetLinks(self):
