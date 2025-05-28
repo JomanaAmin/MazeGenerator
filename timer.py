@@ -6,21 +6,22 @@ class Timer:
         self.limit=limit
         self.x=x
         self.y=y
+        self.currentSeconds=limit
         self.font = pygame.font.SysFont("timesnewroman", 25, True)  # Font name is case-insensitive
-        self.timeElapsed=0
         self.timerActive=False
-        self.timeUp=True
+        self.timeUp=False
         self.screen=screen
-    def startTimer(self):
-        self.startTime=time.time()
+    def resetTimer(self):
+        self.currentSeconds=self.limit
+        self.timerActive=False
+        self.timeUp=False
+    def activateTimer(self):
         self.timerActive=True
-    def updateTimer(self):
-        self.timeElapsed=time.time()-self.startTime
-        if self.timeElapsed>=self.limit:
-            self.TimeUp=True
-            self.timerActive=False
+        self.currentSeconds=self.limit
+    def deactivateTimer(self):
+        self.timerActive=False
 
     def drawTimer(self):
-        timer_text = self.font.render(f"Time: {self.timeElapsed:.2f}s", True, "white")
+        timer_text = self.font.render(f"Time: {self.currentSeconds}s", True, "white")
         text_rect = timer_text.get_rect(center=(self.x, self.y))
         self.screen.blit(timer_text, text_rect)

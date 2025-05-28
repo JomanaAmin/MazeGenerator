@@ -66,14 +66,13 @@ class Maze:
                 if pastCell!=None:
                     self.removeWall(cell, pastCell)
                 yield
-                pastCell=cell
                 unvisited=[]
                 for neighbour in cell.neighbours:
                     if neighbour.visited==False:
                         unvisited.append(neighbour)
                 random.shuffle(unvisited)
                 for neighbour in unvisited:
-                    stack.append((neighbour,pastCell))
+                    stack.append((neighbour,cell))
         self.markAllAsUnvisited()
     def resetMaze(self):
         for y in range(self.size):
@@ -172,9 +171,9 @@ class Maze:
                     queue.append(neighbour)
                     yield
 
-                if neighbour.x == self.size - 1 and neighbour.y == self.size - 1:
-                    neighbour.links["bottom"] = True
-                    return #returns if its the end of the maze
+                    if neighbour.x == self.size - 1 and neighbour.y == self.size - 1:
+                        neighbour.links["bottom"] = True
+                        return #returns if its the end of the maze
 
     def resetLinks(self):
         for x in range(self.size):
@@ -300,7 +299,6 @@ class Maze:
                 if cell.x == self.size - 1 and cell.y == self.size - 1:
                     cell.links["bottom"] = True
                     return
-                pastCell=cell
                 unvisited=[]
                 for neighbour in cell.neighbours:
                     if self.thereIsPath(cell, neighbour) and neighbour.visited==False:
@@ -308,7 +306,7 @@ class Maze:
                         unvisited.append(neighbour)
                 random.shuffle(unvisited)
                 for n in unvisited:
-                    stack.append((n,pastCell))
+                    stack.append((n,cell))
 
 #code for testing empirical analysis
 #

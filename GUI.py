@@ -21,18 +21,21 @@ screenHeight = maze.width + 70
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 font = pygame.font.SysFont("timesnewroman", 25,True)  # Font name is case-insensitive
 
-timer=Timer(20,screen,length*2,maze.width+length)
+timer=Timer(20,screen,length*2.5,maze.width+length*2)
+pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 #BUTTONS
 generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
-clearMaze=Button(screen,maze.width+length,45,"Clear Maze",screenWidth-maze.width-3*length/2)
+clearMaze=Button(screen,maze.width+length,185,"Clear Maze",screenWidth-maze.width-3*length/2)
 solveBFS=Button(screen,maze.width+length,80,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
-solveGreedy = Button(screen, maze.width +length, 185, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
+solveGreedy = Button(screen, maze.width +length, 45, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
 reset=Button(screen,maze.width+length,220,"Reset Maze",screenWidth-maze.width-3*length/2)
 solveAstar=Button(screen,maze.width+length,150,"Solve Maze: A star",screenWidth-maze.width-3*length/2)
 solveDFS=Button(screen,maze.width+length,115,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
+startGame=Button(screen,maze.width+length,255,"Start Game",screenWidth-maze.width-3*length/2)
 #MESSAGES
 win_msg = font.render("You Won!", True, "Black")
+time_msg = font.render("Time is UP!", True, "red")
 
 def drawGridPath():
     #pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2), 5)
@@ -69,8 +72,8 @@ def drawCell(cell):
     if cell.walls["right"]:
         pygame.draw.line(screen, (255,255,255), ((x+1)*length+length/2, y*length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
-
 dfs = maze.DFS()
+canMove=False
 solvingDFS=None
 bfs = None
 greedy = None
@@ -79,6 +82,7 @@ phase = ""
 dfs_done = False
 bfs_done = False
 won=False
+timerStarted=False
 while running:
     screen.fill("grey")
 
@@ -86,13 +90,14 @@ while running:
         if event.type == pygame.QUIT: #if user clicks on the X
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if generateMazeDFS.isClicked():
+            if generateMazeDFS.isClicked() and not timerStarted:
                 maze.resetMaze() #resets maze to original grid
                 dfs = maze.DFS() #calls the function and "yield" stops when a wall gets removed
                 dfs_done = False #since we are starting a new dfs maze, set dfs_done to false, this ensures that player cant move yet and that bfs wont run yet
                 character.reset(length/2) #return character to start position
                 won = False #set won to false since we are JUST starting a new maze
                 phase = "dfs" #set phase to dfs, since we are currently generating
+
 
             elif solveBFS.isClicked() and dfs_done : #if user wants to solve with BFS AND the dfs generation is done a\
                 bfs = maze.BFS() #calls the method for the first time and yield causes it to return once a link is created between two cells
@@ -110,13 +115,22 @@ while running:
                 phase="solvingDFS"
             elif clearMaze.isClicked() and phase not in ["dfs","bfs","Astar","solvingDFS", "greedy"]:
                 maze.resetLinks()
-
+            elif startGame.isClicked() and dfs_done and not canMove and not timerStarted:
+                print("startGame clicked")
+                canMove = True
+                timer.activateTimer()
+                timerStarted = True
             elif reset.isClicked():
                 phase = "reset"
-
+        elif event.type == pygame.USEREVENT and timer.timerActive and dfs_done :
+            timer.currentSeconds -= 1
+            if timer.currentSeconds == 0:
+                timer.timeUp=True
+                timer.deactivateTimer()
 
 
     keys = pygame.key.get_pressed() #returns a list of keys with t or f for each key indicating if it is pressed rn
+
 
 
     if phase == "dfs": #this is true when you click the generateMazeDFS button
@@ -155,20 +169,29 @@ while running:
         character.reset(length/2)
         won = False
         phase = "idle"
-    if not won and dfs_done:  # character can move ONLY when dfs is done and when they did not win yet
+        canMove=False
+        timer.resetTimer()
+        timerStarted = False
+
+    if timer.timeUp:
+        canMove=False
+        screen.blit(time_msg, (screenWidth / 2 - 70, maze.width + 40))
+    if not won and canMove:  # character can move ONLY when dfs is done and when they did not win yet
         character.characterMovement(keys, maze)  # this method processes movement of character
         won = character.mazeSolved(maze)  # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
 
-    elif not won and phase in ["bfs", "greedy", "Astar","solvingDFS"]:  # Allow movement during BFS or Greedy phases
-        character.characterMovement(keys, maze)  # Process character movement
-        won = character.mazeSolved(maze) # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
-    
+    # elif not won and phase in ["bfs", "greedy", "Astar","solvingDFS"] :  # Allow movement during BFS or Greedy phases
+    #     character.characterMovement(keys, maze)  # Process character movement
+    #     won = character.mazeSolved(maze) # as player keeps moving, keep checking whether they won yet, if they did the condition will break, they wint be able to move.
+    #
     elif won:
         # if the user won, draw win msg
         character.resetDirections()
-        screen.blit(win_msg, (screenWidth / 2 - 50, maze.width + 20))
+        canMove=False
+        timer.deactivateTimer()
+        screen.blit(win_msg, (screenWidth / 2 - 60, maze.width + 40))
     #timer.updateTimer()
-    #timer.drawTimer()
+    timer.drawTimer()
     #drawing buttons
     generateMazeDFS.drawButton(screen)
     clearMaze.drawButton(screen)
@@ -177,6 +200,7 @@ while running:
     solveAstar.drawButton(screen)
     solveDFS.drawButton(screen)
     solveGreedy.drawButton(screen)
+    startGame.drawButton(screen)
     drawGrid()#draw grid
 
 
