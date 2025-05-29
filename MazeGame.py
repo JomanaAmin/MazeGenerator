@@ -25,14 +25,15 @@ timer=Timer(20,screen,length*2.5,maze.width+length*2)
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 #BUTTONS
-generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
+#generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
 clearMaze=Button(screen,maze.width+length,185,"Clear Maze",screenWidth-maze.width-3*length/2)
 solveBFS=Button(screen,maze.width+length,80,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
 solveGreedy = Button(screen, maze.width +length, 45, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
 reset=Button(screen,maze.width+length,220,"Reset Maze",screenWidth-maze.width-3*length/2)
 solveAstar=Button(screen,maze.width+length,150,"Solve Maze: A star",screenWidth-maze.width-3*length/2)
 solveDFS=Button(screen,maze.width+length,115,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
-startGame=Button(screen,maze.width+length,255,"Start Game",screenWidth-maze.width-3*length/2)
+startGame=Button(screen,maze.width+length,10,"Start Game",screenWidth-maze.width-3*length/2)
+restartGame=Button(screen,maze.width+length,255,"Restart Game",screenWidth-maze.width-3*length/2)
 #MESSAGES
 win_msg = font.render("You Won!", True, "Black")
 time_msg = font.render("Time is UP!", True, "red")
@@ -90,7 +91,11 @@ while running:
         if event.type == pygame.QUIT: #if user clicks on the X
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if generateMazeDFS.isClicked() and not timerStarted:
+            if startGame.isClicked() and not timerStarted: #and not canMove and dfs_done
+                # print("startGame clicked")
+                # canMove = True
+                # timer.activateTimer()
+                # timerStarted = True
                 maze.resetMaze() #resets maze to original grid
                 dfs = maze.DFS() #calls the function and "yield" stops when a wall gets removed
                 dfs_done = False #since we are starting a new dfs maze, set dfs_done to false, this ensures that player cant move yet and that bfs wont run yet
@@ -115,11 +120,13 @@ while running:
                 phase="solvingDFS"
             elif clearMaze.isClicked() and phase not in ["dfs","bfs","Astar","solvingDFS", "greedy"]:
                 maze.resetLinks()
-            elif startGame.isClicked() and dfs_done and not canMove and not timerStarted:
-                print("startGame clicked")
-                canMove = True
+            elif timerStarted and restartGame.isClicked():
                 timer.activateTimer()
                 timerStarted = True
+                character.reset(length/2)
+                won=False
+                canMove=True
+                timer.timeUp = False
             elif reset.isClicked():
                 phase = "reset"
         elif event.type == pygame.USEREVENT and timer.timerActive and dfs_done :
@@ -139,6 +146,9 @@ while running:
         except StopIteration: #if the stack is empty, the DFS generation method ended
             dfs_done = True #dfs_done is true now, now the player can move
             phase = "idle"  # set phase to idle which just waits for controls
+            canMove = True
+            timer.activateTimer()
+            timerStarted = True
 
     elif phase == "bfs" : #same as dfs generator
         try:
@@ -193,7 +203,7 @@ while running:
     #timer.updateTimer()
     timer.drawTimer()
     #drawing buttons
-    generateMazeDFS.drawButton(screen)
+    #generateMazeDFS.drawButton(screen)
     clearMaze.drawButton(screen)
     solveBFS.drawButton(screen)
     reset.drawButton(screen)
@@ -201,6 +211,8 @@ while running:
     solveDFS.drawButton(screen)
     solveGreedy.drawButton(screen)
     startGame.drawButton(screen)
+    if timerStarted:
+        restartGame.drawButton(screen)
     drawGrid()#draw grid
 
 
