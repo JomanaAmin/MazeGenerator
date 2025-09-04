@@ -24,6 +24,8 @@ font = pygame.font.SysFont("timesnewroman", 25,True)  # Font name is case-insens
 timer=Timer(20,screen,length*2.5,maze.width+length*2)
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
+
+
 #BUTTONS
 #generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
 clearMaze=Button(screen,maze.width+length,185,"Clear Maze",screenWidth-maze.width-3*length/2)
@@ -34,9 +36,11 @@ solveAstar=Button(screen,maze.width+length,150,"Solve Maze: A star",screenWidth-
 solveDFS=Button(screen,maze.width+length,115,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
 startGame=Button(screen,maze.width+length,10,"Start Game",screenWidth-maze.width-3*length/2)
 restartGame=Button(screen,maze.width+length,255,"Restart Game",screenWidth-maze.width-3*length/2)
+
+
 #MESSAGES
-win_msg = font.render("You Won!", True, "Black")
-time_msg = font.render("Time is UP!", True, "red")
+win_msg = font.render("You Won!", True, (130, 112, 129))
+time_msg = font.render("Time is UP!", True, (130, 112, 129))
 
 def drawGridPath():
     #pygame.draw.line(screen,"red",(length/2,0),(length/2,length/2), 5)
@@ -49,10 +53,10 @@ def drawLink(cell):
     y=cell.y
     centerX=x*length+length
     centerY=y*length+length
-    if cell.links["left"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX-length,centerY),5)
-    if cell.links["right"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX+length,centerY),5)
-    if cell.links["top"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY-length),5)
-    if cell.links["bottom"]: pygame.draw.line(screen,"red",(centerX,centerY),(centerX,centerY+length),5)
+    if cell.links["left"]: pygame.draw.line(screen,(227, 208, 216),(centerX,centerY),(centerX-length,centerY),3)
+    if cell.links["right"]: pygame.draw.line(screen,(227, 208, 216),(centerX,centerY),(centerX+length,centerY),3)
+    if cell.links["top"]: pygame.draw.line(screen,(227, 208, 216),(centerX,centerY),(centerX,centerY-length),3)
+    if cell.links["bottom"]: pygame.draw.line(screen,(227, 208, 216),(centerX,centerY),(centerX,centerY+length),3)
 
 def drawGrid():
     for y in range(size):
@@ -63,15 +67,15 @@ def drawCell(cell):
     x=cell.x
     y=cell.y
     if cell.walls["top"]:
-        pygame.draw.line(screen, (255,255,255), (x*length+length/2, y*length+length/2), ((x+1)*length+length/2, y*length+length/2))
+        pygame.draw.line(screen, (231, 230, 247), (x*length+length/2, y*length+length/2), ((x+1)*length+length/2, y*length+length/2))
     if cell.walls["bottom"]:
-        pygame.draw.line(screen, (255,255,255), (x*length+length/2, (y+1) *length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
+        pygame.draw.line(screen, (231, 230, 247), (x*length+length/2, (y+1) *length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
     if cell.walls["left"]:
-        pygame.draw.line(screen, (255,255,255), (x*length+length/2, y*length+length/2), (x*length+length/2, (y+1)*length+length/2))
+        pygame.draw.line(screen, (231, 230, 247), (x*length+length/2, y*length+length/2), (x*length+length/2, (y+1)*length+length/2))
 
     if cell.walls["right"]:
-        pygame.draw.line(screen, (255,255,255), ((x+1)*length+length/2, y*length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
+        pygame.draw.line(screen, (231, 230, 247), ((x+1)*length+length/2, y*length+length/2), ((x+1)*length+length/2, (y+1)*length+length/2))
 
 dfs = maze.DFS()
 canMove=False
@@ -85,9 +89,9 @@ bfs_done = False
 won=False
 timerStarted=False
 while running:
-    screen.fill("grey")
-
-    for event in pygame.event.get():
+    screen.fill((174, 163, 176))
+    events=pygame.event.get()
+    for event in events:
         if event.type == pygame.QUIT: #if user clicks on the X
             running = False
         elif event.type == pygame.MOUSEBUTTONDOWN:
@@ -204,6 +208,15 @@ while running:
     timer.drawTimer()
     #drawing buttons
     #generateMazeDFS.drawButton(screen)
+    clearMaze.update(events)
+    solveBFS.update(events)
+    solveGreedy.update(events)
+    solveAstar.update(events)
+    solveDFS.update(events)
+    startGame.update(events)
+    reset.update(events)
+    restartGame.update(events)
+    ##
     clearMaze.drawButton(screen)
     solveBFS.drawButton(screen)
     reset.drawButton(screen)

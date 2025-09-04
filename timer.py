@@ -22,6 +22,6 @@ class Timer:
         self.timerActive=False
 
     def drawTimer(self):
-        timer_text = self.font.render(f"Time: {self.currentSeconds}s", True, "white")
+        timer_text = self.font.render(f"Time: {self.currentSeconds}s", True, (231, 230, 247))
         text_rect = timer_text.get_rect(center=(self.x, self.y))
         self.screen.blit(timer_text, text_rect)
