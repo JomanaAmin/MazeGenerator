@@ -25,17 +25,29 @@ timer=Timer(20,screen,length*2,maze.width+length)
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 
-
+margin=screenHeight/10
+newY=margin
 #BUTTONS
 #generateMazeDFS=Button(screen,maze.width+length,10,"Generate Maze: DFS",screenWidth-maze.width-3*length/2)
-clearMaze=Button(screen,maze.width+length,185,"Clear Maze",screenWidth-maze.width-3*length/2)
-solveBFS=Button(screen,maze.width+length,80,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
-solveGreedy = Button(screen, maze.width +length, 45, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
-reset=Button(screen,maze.width+length,220,"Reset Maze",screenWidth-maze.width-3*length/2)
-solveAstar=Button(screen,maze.width+length,150,"Solve Maze: A star",screenWidth-maze.width-3*length/2)
-solveDFS=Button(screen,maze.width+length,115,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
-startGame=Button(screen,maze.width+length,10,"Start Game",screenWidth-maze.width-3*length/2)
-restartGame=Button(screen,maze.width+length,255,"Restart Game",screenWidth-maze.width-3*length/2)
+startGame=Button(screen,maze.width+length,newY,"Start Game",screenWidth-maze.width-3*length/2)
+newY+=margin
+solveGreedy = Button(screen, maze.width +length, newY, "Solve Maze: GBFS",screenWidth-maze.width-3*length/2) ###
+newY+=margin
+solveBFS=Button(screen,maze.width+length,newY,"Solve Maze: BFS",screenWidth-maze.width-3*length/2)
+newY+=margin
+clearMaze=Button(screen,maze.width+length,newY,"Clear Maze",screenWidth-maze.width-3*length/2)
+newY+=margin
+
+solveAstar=Button(screen,maze.width+length,newY,"Solve Maze: A star",screenWidth-maze.width-3*length/2)
+newY+=margin
+
+solveDFS=Button(screen,maze.width+length,newY,"Solve Maze: DFS",screenWidth-maze.width-3*length/2)
+newY+=margin
+reset=Button(screen,maze.width+length,newY,"Reset Maze",screenWidth-maze.width-3*length/2)
+newY+=margin
+restartGame=Button(screen,maze.width+length,newY,"Restart Game",screenWidth-maze.width-3*length/2)
+newY+=margin
+
 
 
 #MESSAGES
