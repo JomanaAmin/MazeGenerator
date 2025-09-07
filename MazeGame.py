@@ -10,18 +10,18 @@ pygame.init()
 pygame.display.set_caption("Maze Game")
 clock = pygame.time.Clock()
 running = True
-length=25
+length=50
 size=10
 trials=0
 maze=Maze(size,length)
 character=Character(maze,length/2,length/2)
 #DIMENSIONS
-screenWidth = maze.width + 200
-screenHeight = maze.width + 70
+screenWidth = maze.width + 200 + length*2
+screenHeight = maze.width + 70 + length
 screen = pygame.display.set_mode((screenWidth, screenHeight))
 font = pygame.font.SysFont("timesnewroman", 25,True)  # Font name is case-insensitive
 
-timer=Timer(20,screen,length*2.5,maze.width+length*2)
+timer=Timer(20,screen,length*2,maze.width+length)
 pygame.time.set_timer(pygame.USEREVENT, 1000)
 
 

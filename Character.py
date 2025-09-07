@@ -17,6 +17,10 @@ class Character:
             pygame.image.load(r"sprite/right/right2.png"),
             pygame.image.load(r"sprite/right/right3.png"),
             pygame.image.load(r"sprite/right/right4.png"),
+            pygame.image.load(r"sprite/right/right5.png"),
+            pygame.image.load(r"sprite/right/right6.png"),
+            pygame.image.load(r"sprite/right/right7.png"),
+            pygame.image.load(r"sprite/right/right8.png")
         ]
 
         self.walkLeft = [
@@ -24,24 +28,46 @@ class Character:
             pygame.image.load(r"sprite/left/left2.png"),
             pygame.image.load(r"sprite/left/left3.png"),
             pygame.image.load(r"sprite/left/left4.png"),
+            pygame.image.load(r"sprite/left/left5.png"),
+            pygame.image.load(r"sprite/left/left6.png"),
+            pygame.image.load(r"sprite/left/left7.png"),
+            pygame.image.load(r"sprite/left/left8.png")
         ]
 
         self.walkUp = [
             pygame.image.load(r"sprite/up/up1.png"),
             pygame.image.load(r"sprite/up/up2.png"),
             pygame.image.load(r"sprite/up/up3.png"),
-            pygame.image.load(r"sprite/up/up4.png")
+            pygame.image.load(r"sprite/up/up4.png"),
+            pygame.image.load(r"sprite/up/up5.png"),
+            pygame.image.load(r"sprite/up/up6.png"),
+            pygame.image.load(r"sprite/up/up7.png"),
+            pygame.image.load(r"sprite/up/up8.png")
+
         ]
 
         self.walkDown = [
             pygame.image.load(r"sprite/down/down1.png"),
             pygame.image.load(r"sprite/down/down2.png"),
             pygame.image.load(r"sprite/down/down3.png"),
-            pygame.image.load(r"sprite/down/down4.png")
+            pygame.image.load(r"sprite/down/down4.png"),
+            pygame.image.load(r"sprite/down/down5.png"),
+            pygame.image.load(r"sprite/down/down6.png"),
+            pygame.image.load(r"sprite/down/down7.png"),
+            pygame.image.load(r"sprite/down/down8.png")
+
         ]
-        self.idle=[pygame.image.load(r"sprite/idle/idle1.png"),
-                   pygame.image.load(r"sprite/idle/idle2.png"),
-                   pygame.image.load(r"sprite/idle/idle3.png")]
+        self.idle=[
+            pygame.image.load(r"sprite/idle/idle1.png"),
+            pygame.image.load(r"sprite/idle/idle2.png"),
+            pygame.image.load(r"sprite/idle/idle3.png"),
+            pygame.image.load(r"sprite/idle/idle4.png"),
+            pygame.image.load(r"sprite/idle/idle5.png"),
+            pygame.image.load(r"sprite/idle/idle6.png"),
+            pygame.image.load(r"sprite/idle/idle7.png"),
+            pygame.image.load(r"sprite/idle/idle8.png")
+
+        ]
         self.walkCount=0
 
     def mazeSolved(self,maze):
@@ -80,18 +106,18 @@ class Character:
         return maze.thereIsPath(currCell, nextCell)
 
     def animate(self,screen):
-        if self.walkCount>=26:
+        if self.walkCount>=72:
             self.walkCount=0
         if self.direction["up"]:
-            screen.blit(self.walkUp[self.walkCount%4],(self.x,self.y))
+            screen.blit(self.walkUp[self.walkCount%8],(self.x,self.y))
         elif self.direction["down"]:
-            screen.blit(self.walkDown[self.walkCount%4],(self.x,self.y))
+            screen.blit(self.walkDown[self.walkCount%8],(self.x,self.y))
         elif self.direction["left"]:
-            screen.blit(self.walkLeft[self.walkCount%4],(self.x,self.y))
+            screen.blit(self.walkLeft[self.walkCount%8],(self.x,self.y))
         elif self.direction["right"]:
-            screen.blit(self.walkRight[self.walkCount%4],(self.x,self.y))
+            screen.blit(self.walkRight[self.walkCount%8],(self.x,self.y))
         else:
-            screen.blit(self.idle[self.walkCount%3],(self.x,self.y))
+            screen.blit(self.idle[self.walkCount%8],(self.x,self.y))
 
     def reset(self,pos):
         self.x = pos
@@ -134,7 +160,7 @@ class Character:
             self.direction["right"] = False
             self.direction["up"] = False
             self.direction["down"] = False
-            self.walkCount =0
+            self.walkCount +=1
 
     def resetDirections(self):
         self.direction={
